@@ -1,0 +1,50 @@
+<svg width="640" height="640" viewBox="0 0 640 640" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bgGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(320 340) rotate(90) scale(300)">
+      <stop stop-color="#0B5CA6"/>
+      <stop offset="1" stop-color="#031124"/>
+    </radialGradient>
+    <linearGradient id="ring" x1="65" y1="60" x2="575" y2="585" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#39A8FF"/>
+      <stop offset="1" stop-color="#1B62B8"/>
+    </linearGradient>
+    <linearGradient id="carBody" x1="164" y1="334" x2="458" y2="436" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3DE1FF"/>
+      <stop offset="1" stop-color="#1177BF"/>
+    </linearGradient>
+    <filter id="softShadow" x="66" y="66" width="508" height="508" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#000A15" flood-opacity="0.65"/>
+    </filter>
+  </defs>
+
+  <circle cx="320" cy="320" r="305" fill="#040B1C"/>
+  <g filter="url(#softShadow)">
+    <circle cx="320" cy="320" r="258" fill="url(#bgGlow)" stroke="url(#ring)" stroke-width="26"/>
+    <circle cx="320" cy="320" r="284" stroke="#0C3D77" stroke-width="14"/>
+    <circle cx="320" cy="320" r="232" stroke="#184D8C" stroke-width="3" stroke-opacity="0.85"/>
+  </g>
+
+  <text x="320" y="202" text-anchor="middle" fill="#FFD845" font-size="76" font-weight="900" font-family="Arial, Helvetica, sans-serif" letter-spacing="2">GII.DIECAST</text>
+  <text x="320" y="246" text-anchor="middle" fill="#FFDD59" font-size="34" font-weight="700" font-family="Arial, Helvetica, sans-serif" letter-spacing="7">イマヌエル</text>
+
+  <g transform="translate(0 16)">
+    <ellipse cx="220" cy="436" rx="54" ry="55" fill="#041930" stroke="#0F3B6D" stroke-width="12"/>
+    <ellipse cx="220" cy="436" rx="34" ry="35" fill="#0B1D35" stroke="#F6B200" stroke-width="8"/>
+    <ellipse cx="420" cy="436" rx="54" ry="55" fill="#041930" stroke="#0F3B6D" stroke-width="12"/>
+    <ellipse cx="420" cy="436" rx="34" ry="35" fill="#0B1D35" stroke="#F6B200" stroke-width="8"/>
+
+    <path d="M168 392C203 353 247 332 304 328H391C425 330 454 345 474 372L454 401H352L324 436H204L160 433L168 392Z" fill="url(#carBody)" stroke="#0F406E" stroke-width="7"/>
+    <path d="M242 350L280 314C289 305 303 301 316 303L365 311C376 313 381 323 376 332L356 350H242Z" fill="#123D67" stroke="#0D2F52" stroke-width="5"/>
+    <path d="M238 392H322L297 435H217L238 392Z" fill="#0FA4D8" opacity="0.94"/>
+    <path d="M350 401H447L435 435H334L350 401Z" fill="#0C6FB3"/>
+
+    <circle cx="316" cy="300" r="48" fill="#0E2B4B" stroke="#1E83CF" stroke-width="7"/>
+    <path d="M286 301C286 284 300 270 317 270C333 270 346 283 348 299C337 309 323 314 304 315C296 314 290 309 286 301Z" fill="#5CE3FF"/>
+    <path d="M302 332L343 320" stroke="#1EB6EB" stroke-width="7" stroke-linecap="round"/>
+
+    <path d="M396 318H512C534 318 551 334 551 355V365H432L396 318Z" fill="#1A577D" stroke="#0E3557" stroke-width="6"/>
+    <text x="469" y="354" text-anchor="middle" fill="#DBF6FF" font-size="24" font-weight="700" font-family="Arial, Helvetica, sans-serif">PETRONAS</text>
+
+    <path d="M500 302C522 295 545 300 562 318C580 336 587 361 582 382C570 355 545 328 500 302Z" fill="#9CB6B5" opacity="0.75"/>
+  </g>
+</svg>
