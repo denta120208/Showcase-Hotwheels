@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { FloatingWhatsappButton } from "@/components/floating-whatsapp";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { WebVitalsReporter } from "@/components/web-vitals-reporter";
 
 import "./globals.css";
 
@@ -27,6 +28,7 @@ export default function RootLayout({
         />
       </head>
       <body className="poppins-regular antialiased">
+        <WebVitalsReporter />
         <SiteHeader />
         <main className="mx-auto min-h-[70vh] w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
           {children}

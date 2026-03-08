@@ -2,12 +2,21 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import sharp from "sharp";
 
 import { requireAdmin } from "@/lib/auth";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { toSlug } from "@/lib/utils";
 
 const STORAGE_BUCKET = "product-images";
+const IMAGE_UPLOAD_MAX_LONG_EDGE = Number.parseInt(
+  process.env.IMAGE_UPLOAD_MAX_LONG_EDGE ?? "4096",
+  10,
+);
+const IMAGE_UPLOAD_WEBP_QUALITY = Number.parseInt(
+  process.env.IMAGE_UPLOAD_WEBP_QUALITY ?? "90",
+  10,
+);
 
 function toBool(value: FormDataEntryValue | null) {
   if (!value) {
@@ -36,15 +45,79 @@ function redirectWithError(path: string, message: string): never {
   redirect(`${path}?error=${encodeURIComponent(message)}`);
 }
 
+function normalizeBaseName(fileName: string) {
+  const safeName = fileName.replace(/\s+/g, "-").toLowerCase();
+  return safeName.replace(/\.[^.]+$/, "") || "image";
+}
+
+function getLongEdgeLimit() {
+  if (!Number.isFinite(IMAGE_UPLOAD_MAX_LONG_EDGE) || IMAGE_UPLOAD_MAX_LONG_EDGE < 1024) {
+    return 4096;
+  }
+  return IMAGE_UPLOAD_MAX_LONG_EDGE;
+}
+
+function getWebpQuality() {
+  if (!Number.isFinite(IMAGE_UPLOAD_WEBP_QUALITY)) {
+    return 90;
+  }
+  return Math.min(100, Math.max(70, IMAGE_UPLOAD_WEBP_QUALITY));
+}
+
+async function prepareImageUpload(file: File) {
+  const inputBuffer = Buffer.from(await file.arrayBuffer());
+  const longEdgeLimit = getLongEdgeLimit();
+  const webpQuality = getWebpQuality();
+
+  try {
+    let pipeline = sharp(inputBuffer, { failOn: "none" }).rotate();
+    const metadata = await pipeline.metadata();
+    const width = metadata.width ?? 0;
+    const height = metadata.height ?? 0;
+    const longEdge = Math.max(width, height);
+
+    // Keep original dimensions unless the source is too large.
+    if (longEdge > longEdgeLimit) {
+      pipeline = pipeline.resize({
+        width: longEdgeLimit,
+        height: longEdgeLimit,
+        fit: "inside",
+        withoutEnlargement: true,
+      });
+    }
+
+    const outputBuffer = await pipeline
+      .webp({
+        quality: webpQuality,
+        alphaQuality: 100,
+        smartSubsample: true,
+        effort: 5,
+      })
+      .toBuffer();
+
+    return {
+      buffer: outputBuffer,
+      contentType: "image/webp",
+      extension: "webp",
+    };
+  } catch {
+    const fallbackExt = file.name.split(".").pop()?.toLowerCase() || "jpg";
+    return {
+      buffer: inputBuffer,
+      contentType: file.type || "image/jpeg",
+      extension: fallbackExt,
+    };
+  }
+}
+
 async function uploadImage(file: File, folder: "cover" | "gallery") {
   const admin = createAdminSupabaseClient();
-  const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
-  const safeName = file.name.replace(/\s+/g, "-").toLowerCase();
-  const safeBase = safeName.replace(/\.[^.]+$/, "");
-  const path = `${folder}/${Date.now()}-${crypto.randomUUID()}-${safeBase}.${extension}`;
+  const prepared = await prepareImageUpload(file);
+  const safeBase = normalizeBaseName(file.name);
+  const path = `${folder}/${Date.now()}-${crypto.randomUUID()}-${safeBase}.${prepared.extension}`;
 
-  const { error } = await admin.storage.from(STORAGE_BUCKET).upload(path, file, {
-    contentType: file.type,
+  const { error } = await admin.storage.from(STORAGE_BUCKET).upload(path, prepared.buffer, {
+    contentType: prepared.contentType,
     upsert: false,
   });
 
