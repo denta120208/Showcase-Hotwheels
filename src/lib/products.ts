@@ -2,9 +2,18 @@ import { createServerSupabaseClient } from "./supabase/server";
 import type { Product, ProductImage } from "./supabase/types";
 
 export type ProductFilter = "all" | "ready" | "soldout" | "limited";
+export type ProductCardItem = Pick<
+  Product,
+  "id" | "name" | "price" | "image_url" | "stock" | "is_limited" | "is_soldout"
+>;
+export type ProductDetailItem = Pick<
+  Product,
+  "id" | "name" | "price" | "description" | "image_url" | "stock" | "is_limited" | "is_soldout"
+>;
+export type ProductDetailImage = Pick<ProductImage, "id" | "image_url">;
 
 export interface ProductListResult {
-  items: Product[];
+  items: ProductCardItem[];
   page: number;
   pageSize: number;
   totalCount: number;
@@ -16,11 +25,11 @@ export async function getLatestProducts(limit = 6) {
 
   const { data } = await supabase
     .from("products")
-    .select("*")
+    .select("id,name,price,image_url,stock,is_limited,is_soldout")
     .order("created_at", { ascending: false })
     .limit(limit);
 
-  return (data ?? []) as Product[];
+  return (data ?? []) as ProductCardItem[];
 }
 
 export async function getPaginatedProducts({
@@ -41,7 +50,7 @@ export async function getPaginatedProducts({
 
   let query = supabase
     .from("products")
-    .select("*", { count: "exact" })
+    .select("id,name,price,image_url,stock,is_limited,is_soldout", { count: "exact" })
     .order("created_at", { ascending: false })
     .range(from, to);
 
@@ -62,7 +71,7 @@ export async function getPaginatedProducts({
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
 
   return {
-    items: (data ?? []) as Product[],
+    items: (data ?? []) as ProductCardItem[],
     page: safePage,
     pageSize,
     totalCount,
@@ -75,7 +84,7 @@ export async function getProductById(productId: number) {
 
   const { data: product } = await supabase
     .from("products")
-    .select("*")
+    .select("id,name,price,description,image_url,stock,is_limited,is_soldout")
     .eq("id", productId)
     .maybeSingle();
 
@@ -85,12 +94,12 @@ export async function getProductById(productId: number) {
 
   const { data: images } = await supabase
     .from("product_images")
-    .select("*")
+    .select("id,image_url")
     .eq("product_id", productId)
     .order("sort_order", { ascending: true });
 
   return {
-    product: product as Product,
-    images: (images ?? []) as ProductImage[],
+    product: product as ProductDetailItem,
+    images: (images ?? []) as ProductDetailImage[],
   };
 }

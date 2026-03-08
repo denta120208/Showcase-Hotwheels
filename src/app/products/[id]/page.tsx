@@ -94,14 +94,6 @@ export default async function ProductDetailPage({
                   index === 0 ? "sm:col-span-2 aspect-[16/10]" : "aspect-square"
                 }`}
               >
-                <Image
-                  src={image.image_url}
-                  alt=""
-                  aria-hidden
-                  fill
-                  sizes="(max-width: 640px) 100vw, 50vw"
-                  className="object-cover opacity-35 blur-2xl"
-                />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-900/20 to-sky-900/12" />
                 <div className="absolute inset-2 overflow-hidden rounded-xl border border-white/10 bg-black/25">
                   <Image
@@ -109,6 +101,8 @@ export default async function ProductDetailPage({
                     alt={`${product.name} ${index + 1}`}
                     fill
                     sizes="(max-width: 640px) 100vw, 50vw"
+                    quality={72}
+                    priority={index === 0}
                     className="object-contain p-2"
                   />
                 </div>

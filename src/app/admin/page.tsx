@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { deleteProductAction } from "@/app/actions/admin-products";
 import { loginAction } from "@/app/actions/auth";
-import { getCurrentUserWithProfile } from "@/lib/auth";
+import { getCurrentUserBasicProfile } from "@/lib/auth";
 import { getPaginatedProducts } from "@/lib/products";
 import { formatCurrency, getFirstParam, toInt } from "@/lib/utils";
 
@@ -27,7 +27,7 @@ export default async function AdminDashboardPage({
   const page = toInt(getFirstParam(resolved.page, "1"), 1);
   const message = getFirstParam(resolved.message);
   const error = getFirstParam(resolved.error);
-  const { user, profile } = await getCurrentUserWithProfile();
+  const { user, profile } = await getCurrentUserBasicProfile();
   const isAdmin = Boolean(user && profile?.role === "admin");
 
   if (!isAdmin) {

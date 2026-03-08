@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { logoutAction } from "@/app/actions/auth";
-import { getCurrentUserWithProfile } from "@/lib/auth";
+import { getCurrentUserBasicProfile } from "@/lib/auth";
 
 const links = [
   { href: "/", label: "Home" },
@@ -12,11 +12,11 @@ const links = [
 ];
 
 export async function SiteHeader() {
-  const { profile } = await getCurrentUserWithProfile();
+  const { profile } = await getCurrentUserBasicProfile();
 
   return (
     <header className="sticky top-0 z-50 border-b border-blue-200/15 bg-[#020a1d]/84 backdrop-blur-md">
-      <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center gap-3 px-4 py-3 sm:px-6 lg:px-8">
+      <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center gap-3 px-4 py-3 sm:px-6 lg:flex-nowrap lg:px-8">
         <Link href="/" className="group flex min-w-0 items-center gap-3">
           <div className="hero-logo-shell relative h-12 w-12 overflow-hidden transition duration-200 group-hover:scale-[1.03]">
             <Image
@@ -38,7 +38,7 @@ export async function SiteHeader() {
           </div>
         </Link>
 
-        <div className="ml-auto flex items-center gap-2">
+        <div className="order-2 ml-auto flex items-center gap-2 lg:order-3">
           {profile ? (
             <>
               {profile.role === "admin" ? (
@@ -50,10 +50,20 @@ export async function SiteHeader() {
                   <span className="hidden sm:inline">Dashboard Admin</span>
                 </Link>
               ) : null}
-              <span className="hidden text-xs text-slate-300 md:inline">
-                Halo, {profile.name}
-              </span>
-              <form action={logoutAction}>
+              <div className="hidden items-center gap-2 rounded-full border border-blue-200/30 bg-slate-950/45 px-2 py-1 lg:flex">
+                <span className="max-w-[170px] truncate pl-1 text-xs text-slate-200">
+                  Halo, {profile.name}
+                </span>
+                <form action={logoutAction}>
+                  <button
+                    type="submit"
+                    className="rounded-full border border-red-300/35 bg-red-500/12 px-2.5 py-1 text-[11px] font-semibold text-red-100 hover:bg-red-500/24"
+                  >
+                    Logout
+                  </button>
+                </form>
+              </div>
+              <form action={logoutAction} className="lg:hidden">
                 <button
                   type="submit"
                   className="rounded-full border border-red-300/35 bg-red-500/12 px-3 py-1.5 text-xs font-semibold text-red-100 hover:bg-red-500/24"
@@ -80,7 +90,7 @@ export async function SiteHeader() {
           )}
         </div>
 
-        <nav className="order-3 w-full overflow-x-auto rounded-2xl border border-blue-200/18 bg-[#0a1f46]/55 p-1.5 text-sm font-medium text-slate-100 sm:order-none sm:w-auto sm:rounded-full">
+        <nav className="order-3 w-full overflow-x-auto rounded-2xl border border-blue-200/18 bg-[#0a1f46]/55 p-1.5 text-sm font-medium text-slate-100 lg:order-2 lg:mx-auto lg:w-auto lg:rounded-full">
           <div className="flex min-w-max items-center gap-1.5">
             {links.map((link) => (
               <Link

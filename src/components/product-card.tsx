@@ -1,10 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import type { Product } from "@/lib/supabase/types";
+import type { ProductCardItem } from "@/lib/products";
 import { formatCurrency } from "@/lib/utils";
 
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({ product }: { product: ProductCardItem }) {
   const isSoldOut = product.is_soldout;
 
   return (
@@ -13,22 +13,15 @@ export function ProductCard({ product }: { product: Product }) {
         <div className="relative aspect-[4/3] w-full overflow-hidden border-b border-blue-100/15 bg-slate-950/50">
           {product.image_url ? (
             <>
-              <Image
-                src={product.image_url}
-                alt=""
-                aria-hidden
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                className="object-cover opacity-35 blur-2xl transition duration-500 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/25 to-sky-900/18" />
-              <div className="absolute inset-3 overflow-hidden rounded-2xl border border-white/12 bg-black/20 shadow-[0_14px_30px_rgba(2,8,20,0.44)]">
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/82 via-slate-950/35 to-sky-900/16" />
+              <div className="absolute inset-3 overflow-hidden rounded-2xl border border-white/12 bg-black/26 shadow-[0_14px_30px_rgba(2,8,20,0.44)]">
                 <Image
                   src={product.image_url}
                   alt={product.name}
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  className="object-contain p-2.5 transition duration-500 group-hover:scale-[1.04]"
+                  quality={70}
+                  className="object-contain p-2.5 transition duration-500 group-hover:scale-[1.03]"
                 />
               </div>
             </>
