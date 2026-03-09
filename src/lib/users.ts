@@ -1,4 +1,4 @@
-import { createServerSupabaseClient } from "./supabase/server";
+import { createServerSupabaseClient, hasSupabaseEnv } from "./supabase/server";
 import type { UserProfile } from "./supabase/types";
 
 export type UserRegistrationItem = Pick<
@@ -46,9 +46,20 @@ export async function getPaginatedUserRegistrations({
   page?: number;
   pageSize?: number;
 }): Promise<UserRegistrationListResult> {
-  const supabase = await createServerSupabaseClient();
   const safePage = page < 1 ? 1 : page;
   const safePageSize = Math.min(Math.max(pageSize, 8), 20);
+
+  if (!hasSupabaseEnv()) {
+    return {
+      items: [],
+      page: safePage,
+      pageSize: safePageSize,
+      totalCount: 0,
+      totalPages: 1,
+    };
+  }
+
+  const supabase = await createServerSupabaseClient();
   const from = (safePage - 1) * safePageSize;
   const to = from + safePageSize - 1;
   const keyword = normalizeSearchKeyword(search);
@@ -87,6 +98,10 @@ export async function getUserRegistrationsForExport({
   page?: number;
   pageSize?: number;
 }) {
+  if (!hasSupabaseEnv()) {
+    return [];
+  }
+
   const supabase = await createServerSupabaseClient();
   const safePage = page < 1 ? 1 : page;
   const safePageSize = Math.min(Math.max(pageSize, 8), 30);
@@ -119,6 +134,10 @@ export async function getAllUserRegistrationsForExport({
   batchSize?: number;
   maxRows?: number;
 }): Promise<UserRegistrationExportAllResult> {
+  if (!hasSupabaseEnv()) {
+    return { items: [], truncated: false };
+  }
+
   const supabase = await createServerSupabaseClient();
   const safeBatchSize = Math.min(Math.max(batchSize, 50), 200);
   const safeMaxRows = Math.min(Math.max(maxRows, 200), 5000);

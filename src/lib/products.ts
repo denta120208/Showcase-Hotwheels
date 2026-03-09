@@ -1,4 +1,4 @@
-import { createServerSupabaseClient } from "./supabase/server";
+import { createServerSupabaseClient, hasSupabaseEnv } from "./supabase/server";
 import type { Product, ProductImage } from "./supabase/types";
 
 export type ProductFilter = "all" | "ready" | "soldout" | "limited";
@@ -21,6 +21,10 @@ export interface ProductListResult {
 }
 
 export async function getLatestProducts(limit = 6) {
+  if (!hasSupabaseEnv()) {
+    return [];
+  }
+
   const supabase = await createServerSupabaseClient();
 
   const { data } = await supabase
@@ -43,10 +47,22 @@ export async function getPaginatedProducts({
   page?: number;
   pageSize?: number;
 }): Promise<ProductListResult> {
-  const supabase = await createServerSupabaseClient();
   const safePage = page < 1 ? 1 : page;
-  const from = (safePage - 1) * pageSize;
-  const to = from + pageSize - 1;
+  const safePageSize = pageSize < 1 ? 12 : pageSize;
+
+  if (!hasSupabaseEnv()) {
+    return {
+      items: [],
+      page: safePage,
+      pageSize: safePageSize,
+      totalCount: 0,
+      totalPages: 1,
+    };
+  }
+
+  const supabase = await createServerSupabaseClient();
+  const from = (safePage - 1) * safePageSize;
+  const to = from + safePageSize - 1;
 
   let query = supabase
     .from("products")
@@ -68,18 +84,22 @@ export async function getPaginatedProducts({
 
   const { data, count } = await query;
   const totalCount = count ?? 0;
-  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+  const totalPages = Math.max(1, Math.ceil(totalCount / safePageSize));
 
   return {
     items: (data ?? []) as ProductCardItem[],
     page: safePage,
-    pageSize,
+    pageSize: safePageSize,
     totalCount,
     totalPages,
   };
 }
 
 export async function getProductById(productId: number) {
+  if (!hasSupabaseEnv()) {
+    return null;
+  }
+
   const supabase = await createServerSupabaseClient();
 
   const { data: product } = await supabase

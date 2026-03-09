@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { cache } from "react";
 import type { User } from "@supabase/supabase-js";
 
-import { createServerSupabaseClient } from "./supabase/server";
+import { createServerSupabaseClient, hasSupabaseEnv } from "./supabase/server";
 import type { UserProfile } from "./supabase/types";
 
 export type BasicUserProfile = Pick<UserProfile, "id" | "name" | "email" | "role">;
@@ -13,6 +13,10 @@ async function getCurrentUserProfileBySelect<TProfile extends Partial<UserProfil
   user: User | null;
   profile: TProfile | null;
 }> {
+  if (!hasSupabaseEnv()) {
+    return { user: null, profile: null as TProfile | null };
+  }
+
   const supabase = await createServerSupabaseClient();
 
   const {
