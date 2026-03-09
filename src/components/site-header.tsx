@@ -2,17 +2,25 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { logoutAction } from "@/app/actions/auth";
+import {
+  HomeIcon,
+  PaymentIcon,
+  ProductsIcon,
+  ShippingIcon,
+} from "@/components/ui/app-icons";
 import { getCurrentUserBasicProfile } from "@/lib/auth";
 
 const links = [
-  { href: "/", label: "Home" },
-  { href: "/products", label: "Produk" },
-  { href: "/payment", label: "Payment" },
-  { href: "/shipping", label: "Pengiriman" },
+  { href: "/", label: "Home", icon: HomeIcon },
+  { href: "/products", label: "Produk", icon: ProductsIcon },
+  { href: "/payment", label: "Payment", icon: PaymentIcon },
+  { href: "/shipping", label: "Pengiriman", icon: ShippingIcon },
 ];
 
 export async function SiteHeader() {
   const { profile } = await getCurrentUserBasicProfile();
+  const isAdmin = profile?.role === "admin";
+  const navLinks = isAdmin ? links.slice(0, 1) : links;
 
   return (
     <header className="sticky top-0 z-50 border-b border-blue-200/15 bg-[#020a1d]/84 backdrop-blur-md">
@@ -41,7 +49,7 @@ export async function SiteHeader() {
         <div className="order-2 ml-auto flex items-center gap-2 lg:order-3">
           {profile ? (
             <>
-              {profile.role === "admin" ? (
+              {isAdmin ? (
                 <Link
                   href="/admin"
                   className="rounded-full border border-emerald-300/45 bg-emerald-400/12 px-3 py-1.5 text-xs font-semibold text-emerald-100 hover:bg-emerald-400/20"
@@ -92,15 +100,20 @@ export async function SiteHeader() {
 
         <nav className="order-3 w-full overflow-x-auto rounded-2xl border border-blue-200/18 bg-[#0a1f46]/55 p-1.5 text-sm font-medium text-slate-100 lg:order-2 lg:mx-auto lg:w-auto lg:rounded-full">
           <div className="flex min-w-max items-center gap-1.5">
-            {links.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="rounded-full border border-transparent px-3 py-1.5 transition hover:border-blue-200/40 hover:bg-blue-300/12"
-              >
-                {link.label}
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              const Icon = link.icon;
+
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-transparent px-3 py-1.5 transition hover:border-blue-200/40 hover:bg-blue-300/12"
+                >
+                  <Icon className="h-3.5 w-3.5 text-cyan-100/90" aria-hidden="true" />
+                  <span>{link.label}</span>
+                </Link>
+              );
+            })}
           </div>
         </nav>
       </div>

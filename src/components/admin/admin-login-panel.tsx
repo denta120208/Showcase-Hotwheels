@@ -9,8 +9,8 @@ export function AdminLoginPanel({
 }) {
   return (
     <div className="mx-auto w-full max-w-lg space-y-4">
-      <section className="panel rounded-3xl border border-blue-200/20 p-5 sm:p-6">
-        <h1 className="display-font text-3xl text-white sm:text-4xl">Admin Login</h1>
+      <section className="panel rounded-2xl border border-blue-200/20 p-4 sm:rounded-3xl sm:p-6">
+        <h1 className="display-font text-2xl text-white sm:text-4xl">Admin Login</h1>
         <p className="muted-text mt-1 text-sm">
           Akses dashboard admin hanya melalui halaman ini: /admin
         </p>
@@ -27,7 +27,7 @@ export function AdminLoginPanel({
           </div>
         ) : null}
 
-        <form action={loginAction} className="mt-5 space-y-3">
+        <form action={loginAction} className="mt-5 space-y-3 sm:space-y-4">
           <input type="hidden" name="intent" value="admin" />
           <div className="space-y-1">
             <label htmlFor="identifier" className="text-xs font-semibold text-slate-200">

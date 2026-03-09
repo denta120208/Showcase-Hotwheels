@@ -17,16 +17,16 @@ export default async function NewProductPage({
   const error = getFirstParam(resolved.error);
 
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-4">
-      <section className="panel rounded-3xl border border-emerald-300/25 p-5 sm:p-6">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="mx-auto w-full max-w-4xl space-y-4">
+      <section className="panel rounded-2xl border border-emerald-300/25 p-4 sm:rounded-3xl sm:p-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="display-font text-3xl text-white sm:text-4xl">Tambah Produk</h1>
+            <h1 className="display-font text-2xl text-white sm:text-4xl">Tambah Produk</h1>
             <p className="muted-text text-sm">Tambah produk baru ke katalog.</p>
           </div>
           <Link
             href="/admin"
-            className="rounded-lg border border-slate-300/35 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-slate-200/10"
+            className="w-full rounded-lg border border-slate-300/35 px-3 py-2 text-center text-xs font-semibold text-slate-200 hover:bg-slate-200/10 sm:w-auto sm:py-1.5"
           >
             Kembali
           </Link>
@@ -38,7 +38,7 @@ export default async function NewProductPage({
           </div>
         ) : null}
 
-        <form action={createProductAction} className="mt-5 grid gap-3 md:grid-cols-2">
+        <form action={createProductAction} className="mt-5 grid gap-3 sm:gap-4 md:grid-cols-2">
           <div className="space-y-1 md:col-span-2">
             <label htmlFor="name" className="text-xs font-semibold text-slate-200">
               Nama Produk
@@ -108,7 +108,7 @@ export default async function NewProductPage({
               type="file"
               accept="image/*"
               required
-              className="w-full rounded-xl border border-blue-100/20 bg-slate-950/40 px-4 py-2.5 text-sm text-slate-200 file:mr-3 file:rounded-lg file:border-0 file:bg-sky-400 file:px-3 file:py-1 file:text-xs file:font-bold file:text-slate-900"
+              className="w-full rounded-xl border border-blue-100/20 bg-slate-950/40 px-4 py-2.5 text-sm text-slate-200 file:mb-2 file:mr-0 file:w-full file:rounded-lg file:border-0 file:bg-sky-400 file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-slate-900 sm:file:mb-0 sm:file:mr-3 sm:file:w-auto sm:file:py-1"
             />
           </div>
 
@@ -125,7 +125,7 @@ export default async function NewProductPage({
               type="file"
               accept="image/*"
               multiple
-              className="w-full rounded-xl border border-blue-100/20 bg-slate-950/40 px-4 py-2.5 text-sm text-slate-200 file:mr-3 file:rounded-lg file:border-0 file:bg-sky-400 file:px-3 file:py-1 file:text-xs file:font-bold file:text-slate-900"
+              className="w-full rounded-xl border border-blue-100/20 bg-slate-950/40 px-4 py-2.5 text-sm text-slate-200 file:mb-2 file:mr-0 file:w-full file:rounded-lg file:border-0 file:bg-sky-400 file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-slate-900 sm:file:mb-0 sm:file:mr-3 sm:file:w-auto sm:file:py-1"
             />
           </div>
 
@@ -141,7 +141,7 @@ export default async function NewProductPage({
 
           <button
             type="submit"
-            className="md:col-span-2 mt-2 w-full rounded-xl bg-emerald-400 px-4 py-2.5 text-sm font-bold text-emerald-950 hover:bg-emerald-300"
+            className="mt-2 w-full rounded-xl bg-emerald-400 px-4 py-2.5 text-sm font-bold text-emerald-950 hover:bg-emerald-300 md:col-span-2"
           >
             Simpan Produk
           </button>

@@ -2,6 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { ProductCard } from "@/components/product-card";
+import {
+  ForumIcon,
+  ProductsIcon,
+  ShopeeIcon,
+  WhatsappIcon,
+} from "@/components/ui/app-icons";
 import { getLatestProducts } from "@/lib/products";
 import {
   SHOPEE_STORE_URL,
@@ -27,36 +33,92 @@ export default async function HomePage() {
               koleksi favoritmu lalu pesan langsung ke admin via WhatsApp.
             </p>
 
-            <div className="flex flex-wrap gap-2.5">
-              <Link href="/products" className="neo-btn-primary w-full px-5 py-2 text-center text-sm sm:w-auto">
-                Lihat Produk
-              </Link>
-              <a
-                href={WHATSAPP_GROUP_MAIN}
-                className="neo-btn-outline w-full px-5 py-2 text-center text-sm sm:w-auto"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Join WhatsApp Group
-              </a>
-              <a
-                href={SHOPEE_STORE_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="neo-btn-outline w-full px-5 py-2 text-center text-sm sm:w-auto"
-              >
-                Shopee Store
-              </a>
+            <div className="sm:hidden">
+              <div className="relative overflow-hidden rounded-2xl border border-cyan-200/22 bg-[#071d40]/52 p-3">
+                <div className="absolute -top-8 -right-8 h-24 w-24 rounded-full bg-cyan-300/18 blur-2xl" />
+                <div className="relative space-y-2.5">
+                  <div className="grid gap-2">
+                    <Link
+                      href="/products"
+                      className="neo-btn-primary inline-flex min-h-11 w-full items-center justify-center gap-2 px-5 py-2 text-sm"
+                    >
+                      <ProductsIcon className="h-4 w-4" aria-hidden="true" />
+                      Lihat Produk
+                    </Link>
+                    <a
+                      href={WHATSAPP_GROUP_MAIN}
+                      className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-emerald-300/45 bg-emerald-400/14 px-4 py-2 text-sm font-semibold text-emerald-100 transition hover:bg-emerald-400/24"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <WhatsappIcon className="h-4 w-4 text-emerald-100" aria-hidden="true" />
+                      Join WhatsApp Group
+                    </a>
+                  </div>
+
+                  <div className="grid gap-2">
+                    <a
+                      href={SHOPEE_STORE_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-orange-200/40 bg-orange-400/14 px-4 py-2 text-sm font-semibold text-orange-100 transition hover:bg-orange-400/24"
+                    >
+                      <ShopeeIcon className="h-4 w-4 text-orange-100" aria-hidden="true" />
+                      Shopee Store
+                    </a>
+                    <a
+                      href={WHATSAPP_GROUP_FORUM}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-sky-200/35 bg-sky-400/12 px-4 py-2 text-sm font-semibold text-sky-100 transition hover:bg-sky-300/22"
+                    >
+                      <ForumIcon className="h-4 w-4 text-cyan-100" aria-hidden="true" />
+                      Forum Chat WhatsApp
+                    </a>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <a
-              href={WHATSAPP_GROUP_FORUM}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex rounded-full border border-blue-200/25 bg-blue-400/8 px-4 py-1.5 text-xs font-semibold text-slate-100 hover:bg-blue-300/16"
-            >
-              Forum Chat WhatsApp
-            </a>
+            <div className="hidden sm:block">
+              <div className="flex flex-wrap gap-2.5">
+                <Link
+                  href="/products"
+                  className="neo-btn-primary inline-flex w-full items-center justify-center gap-2 px-5 py-2 text-sm sm:w-auto"
+                >
+                  <ProductsIcon className="h-4 w-4" aria-hidden="true" />
+                  Lihat Produk
+                </Link>
+                <a
+                  href={WHATSAPP_GROUP_MAIN}
+                  className="neo-btn-outline inline-flex w-full items-center justify-center gap-2 px-5 py-2 text-sm sm:w-auto"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <WhatsappIcon className="h-4 w-4 text-emerald-200" aria-hidden="true" />
+                  Join WhatsApp Group
+                </a>
+                <a
+                  href={SHOPEE_STORE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="neo-btn-outline inline-flex w-full items-center justify-center gap-2 px-5 py-2 text-sm sm:w-auto"
+                >
+                  <ShopeeIcon className="h-4 w-4 text-orange-200" aria-hidden="true" />
+                  Shopee Store
+                </a>
+              </div>
+
+              <a
+                href={WHATSAPP_GROUP_FORUM}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 inline-flex items-center gap-2 rounded-full border border-blue-200/25 bg-blue-400/8 px-4 py-1.5 text-xs font-semibold text-slate-100 hover:bg-blue-300/16"
+              >
+                <ForumIcon className="h-4 w-4 text-cyan-100" aria-hidden="true" />
+                Forum Chat WhatsApp
+              </a>
+            </div>
           </div>
 
           <div className="space-y-4">

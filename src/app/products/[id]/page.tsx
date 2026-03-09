@@ -88,10 +88,14 @@ export default async function ProductDetailPage({
         {gallery.length > 0 ? (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {gallery.map((image, index) => (
-              <div
+              <a
                 key={`${image.id}-${index}`}
+                href={image.image_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Klik untuk melihat gambar ukuran asli"
                 className={`relative overflow-hidden rounded-2xl border border-blue-100/20 bg-black/40 ${
-                  index === 0 ? "sm:col-span-2 aspect-[16/10]" : "aspect-square"
+                  index === 0 ? "aspect-[16/10] sm:col-span-2" : "aspect-square"
                 }`}
               >
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-900/20 to-sky-900/12" />
@@ -103,10 +107,13 @@ export default async function ProductDetailPage({
                     sizes="(max-width: 640px) 100vw, 50vw"
                     quality={72}
                     priority={index === 0}
-                    className="object-contain p-2"
+                    className="object-contain p-2 transition duration-300 hover:scale-[1.02]"
                   />
                 </div>
-              </div>
+                <span className="absolute right-3 bottom-3 rounded-full border border-sky-200/45 bg-sky-400/20 px-2.5 py-1 text-[10px] font-semibold text-sky-100">
+                 Lihat Gambar
+                </span>
+              </a>
             ))}
           </div>
         ) : (
