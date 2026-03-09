@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { registerAction } from "@/app/actions/auth";
+import { PasswordField } from "@/components/auth/password-field";
 import { getFirstParam } from "@/lib/utils";
 
 type SearchParams = Record<string, string | string[] | undefined>;
@@ -66,7 +67,7 @@ export default async function RegisterPage({
           <Field id="phone" label="No Telp" required />
           <Field id="tiktok" label="Nama TikTok / Instagram" />
           <Field id="email" label="Email" required type="email" />
-          <Field id="password" label="Password" required type="password" />
+          <PasswordField id="password" label="Password" required />
 
           <button
             type="submit"

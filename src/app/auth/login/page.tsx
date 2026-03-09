@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { loginAction } from "@/app/actions/auth";
+import { PasswordField } from "@/components/auth/password-field";
 import { getFirstParam } from "@/lib/utils";
 
 type SearchParams = Record<string, string | string[] | undefined>;
@@ -49,21 +50,7 @@ export default async function LoginPage({
             />
           </div>
 
-          <div className="space-y-1">
-            <label
-              htmlFor="password"
-              className="text-xs font-semibold text-slate-200"
-            >
-              Password
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              required
-              className="w-full rounded-xl border border-blue-100/20 bg-slate-950/40 px-4 py-2.5 text-sm text-white outline-none focus:border-sky-300/60"
-            />
-          </div>
+          <PasswordField id="password" label="Password" required />
 
           <button
             type="submit"

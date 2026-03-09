@@ -323,7 +323,7 @@ export async function loginAction(formData: FormData) {
     );
   }
 
-  redirect("/products");
+  redirect("/home");
 }
 
 export async function logoutAction() {
