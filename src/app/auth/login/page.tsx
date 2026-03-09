@@ -19,7 +19,7 @@ export default async function LoginPage({
       <section className="panel rounded-3xl border border-blue-200/20 p-6">
         <h1 className="display-font text-4xl text-white">Login User</h1>
         <p className="muted-text mt-1 text-sm">
-          Login untuk bisa melakukan pemesanan via WhatsApp.
+          Setelah login pertama, kamu akan diarahkan untuk melengkapi alamat wajib.
         </p>
 
         {error ? (

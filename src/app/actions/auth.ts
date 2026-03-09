@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { hasCompletedAddressProfile } from "@/lib/user-profile";
 
 function redirectWithError(path: string, message: string): never {
   redirect(`${path}?error=${encodeURIComponent(message)}`);
@@ -135,12 +136,6 @@ export async function registerAction(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim();
   const tiktok = String(formData.get("tiktok") ?? "").trim();
-  const addressDetail = String(formData.get("address_detail") ?? "").trim();
-  const village = String(formData.get("village") ?? "").trim();
-  const province = String(formData.get("province") ?? "").trim();
-  const regency = String(formData.get("regency") ?? "").trim();
-  const district = String(formData.get("district") ?? "").trim();
-  const postalCode = String(formData.get("postal_code") ?? "").trim();
   const email = normalizeEmail(String(formData.get("email") ?? ""));
   const password = String(formData.get("password") ?? "");
 
@@ -219,12 +214,6 @@ export async function registerAction(formData: FormData) {
       name,
       phone: phone || null,
       tiktok: tiktok || null,
-      address_detail: addressDetail || null,
-      village: village || null,
-      province: province || null,
-      regency: regency || null,
-      district: district || null,
-      postal_code: postalCode || null,
       email,
       role: "user",
     },
@@ -236,16 +225,21 @@ export async function registerAction(formData: FormData) {
   }
 
   if (hasSession) {
-    redirectWithMessage("/products", "Registrasi berhasil, selamat datang!");
+    redirect(
+      "/user/profile?message=Akun+berhasil+dibuat.+Sekarang+isi+alamat+wajib+terlebih+dahulu.",
+    );
   }
 
   if (fallbackUsed) {
-    redirectWithMessage("/auth/login", "Registrasi berhasil. Silakan login.");
+    redirectWithMessage(
+      "/auth/login",
+      "Akun berhasil dibuat. Login lalu isi alamat wajib sebelum akses produk.",
+    );
   }
 
   redirectWithMessage(
     "/auth/login",
-    "Registrasi berhasil. Silakan cek email verifikasi lalu login.",
+    "Akun berhasil dibuat. Silakan cek email verifikasi, lalu login untuk isi alamat wajib.",
   );
 }
 
@@ -308,7 +302,7 @@ export async function loginAction(formData: FormData) {
 
   const { data: profile } = await supabase
     .from("users")
-    .select("role")
+    .select("role,address_detail,village,regency,district,province,postal_code")
     .eq("id", data.user.id)
     .maybeSingle();
 
@@ -321,6 +315,12 @@ export async function loginAction(formData: FormData) {
 
   if (isAdmin) {
     redirect("/admin");
+  }
+
+  if (!hasCompletedAddressProfile(profile)) {
+    redirect(
+      "/user/profile?message=Lengkapi+alamat+wajib+terlebih+dahulu+sebelum+mengakses+produk.",
+    );
   }
 
   redirect("/products");

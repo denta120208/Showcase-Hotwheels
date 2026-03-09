@@ -8,9 +8,11 @@ import {
   ProductsIcon,
   ShippingIcon,
 } from "@/components/ui/app-icons";
-import { getCurrentUserBasicProfile } from "@/lib/auth";
+import { getCurrentUserWithProfile } from "@/lib/auth";
+import { hasCompletedAddressProfile } from "@/lib/user-profile";
 
-const links = [
+const homeLink = { href: "/", label: "Home", icon: HomeIcon };
+const catalogLinks = [
   { href: "/", label: "Home", icon: HomeIcon },
   { href: "/products", label: "Produk", icon: ProductsIcon },
   { href: "/payment", label: "Payment", icon: PaymentIcon },
@@ -18,9 +20,16 @@ const links = [
 ];
 
 export async function SiteHeader() {
-  const { profile } = await getCurrentUserBasicProfile();
+  const { profile } = await getCurrentUserWithProfile();
   const isAdmin = profile?.role === "admin";
-  const navLinks = isAdmin ? links.slice(0, 1) : links;
+  const addressCompleted = hasCompletedAddressProfile(profile);
+  const navLinks = isAdmin
+    ? [homeLink]
+    : profile
+      ? addressCompleted
+        ? catalogLinks
+        : [homeLink]
+      : catalogLinks;
 
   return (
     <header className="sticky top-0 z-50 border-b border-blue-200/15 bg-[#020a1d]/84 backdrop-blur-md">
@@ -57,7 +66,14 @@ export async function SiteHeader() {
                   <span className="sm:hidden">Admin</span>
                   <span className="hidden sm:inline">Dashboard Admin</span>
                 </Link>
-              ) : null}
+              ) : (
+                <Link
+                  href="/user/profile"
+                  className="rounded-full border border-sky-300/40 bg-sky-400/12 px-3 py-1.5 text-xs font-semibold text-sky-100 hover:bg-sky-400/24"
+                >
+                  Profil
+                </Link>
+              )}
               <div className="hidden items-center gap-2 rounded-full border border-blue-200/30 bg-slate-950/45 px-2 py-1 lg:flex">
                 <span className="max-w-[170px] truncate pl-1 text-xs text-slate-200">
                   Halo, {profile.name}

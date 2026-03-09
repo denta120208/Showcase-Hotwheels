@@ -46,7 +46,7 @@ export default async function RegisterPage({
       <section className="panel rounded-3xl border border-blue-200/20 p-6">
         <h1 className="display-font text-4xl text-white">Register User</h1>
         <p className="muted-text mt-1 text-sm">
-          Isi data lengkap user sebelum melakukan pemesanan.
+          Step 1: buat akun dulu. Setelah akun jadi, kamu wajib isi alamat di halaman profil.
         </p>
 
         {error ? (
@@ -66,28 +66,7 @@ export default async function RegisterPage({
           <Field id="phone" label="No Telp" required />
           <Field id="tiktok" label="Nama TikTok / Instagram" />
           <Field id="email" label="Email" required type="email" />
-          <Field id="village" label="Kota / Desa" />
-          <Field id="province" label="Provinsi" />
-          <Field id="regency" label="Kabupaten" />
-          <Field id="district" label="Kecamatan" />
-          <Field id="postal_code" label="Kode Pos" />
           <Field id="password" label="Password" required type="password" />
-
-          <div className="space-y-1 md:col-span-2">
-            <label
-              htmlFor="address_detail"
-              className="text-xs font-semibold text-slate-200"
-            >
-              Detail Alamat / Patokan
-            </label>
-            <textarea
-              id="address_detail"
-              name="address_detail"
-              rows={4}
-              placeholder="Contoh: pagar hitam, tembok putih, samping sekolah..."
-              className="w-full rounded-xl border border-blue-100/20 bg-slate-950/40 px-4 py-2.5 text-sm text-white outline-none placeholder:text-slate-400 focus:border-sky-300/60"
-            />
-          </div>
 
           <button
             type="submit"

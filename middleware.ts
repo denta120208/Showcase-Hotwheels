@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 import type { Database } from "@/lib/supabase/types";
+import { hasCompletedAddressProfile } from "@/lib/user-profile";
 
 export async function middleware(request: NextRequest) {
   const response = NextResponse.next({
@@ -38,7 +39,7 @@ export async function middleware(request: NextRequest) {
   if (user) {
     const { data: profile } = await supabase
       .from("users")
-      .select("role")
+      .select("role,address_detail,village,regency,district,province,postal_code")
       .eq("id", user.id)
       .maybeSingle();
 
@@ -53,6 +54,23 @@ export async function middleware(request: NextRequest) {
       const redirectUrl = request.nextUrl.clone();
       redirectUrl.pathname = "/admin";
       redirectUrl.searchParams.set("message", "Menu admin dibatasi ke Home dan Dashboard.");
+
+      return NextResponse.redirect(redirectUrl);
+    }
+
+    const isUserProfileAllowedPath =
+      pathname === "/" ||
+      pathname === "/user/profile" ||
+      pathname.startsWith("/user/profile/") ||
+      pathname.startsWith("/api/");
+
+    if (!isAdmin && !hasCompletedAddressProfile(profile) && !isUserProfileAllowedPath) {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = "/user/profile";
+      redirectUrl.searchParams.set(
+        "message",
+        "Lengkapi alamat wajib terlebih dahulu sebelum mengakses menu lain.",
+      );
 
       return NextResponse.redirect(redirectUrl);
     }

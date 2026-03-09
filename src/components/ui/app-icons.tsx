@@ -43,6 +43,15 @@ export function ShippingIcon(props: IconProps) {
   );
 }
 
+export function UserIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} {...props}>
+      <circle cx="12" cy="7.5" r="3.2" />
+      <path d="M5 19.2c1.6-3.1 4.1-4.7 7-4.7s5.4 1.6 7 4.7" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function WhatsappIcon(props: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} {...props}>
