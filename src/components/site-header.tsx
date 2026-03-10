@@ -37,11 +37,11 @@ export async function SiteHeader() {
         <Link href="/" className="group flex min-w-0 items-center gap-3">
           <div className="hero-logo-shell relative h-12 w-12 overflow-hidden transition duration-200 group-hover:scale-[1.03]">
             <Image
-              src="/logo-clean.png"
+              src="/logo.png"
               alt="Logo GII.Diecast"
               fill
               sizes="48px"
-              className="object-cover"
+              className="scale-[1.02] rounded-full object-cover object-[46%_50%]"
               priority
             />
           </div>

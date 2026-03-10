@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { getCurrentUserWithProfile } from "@/lib/auth";
 import { ADMIN_WHATSAPP_NUMBER } from "@/lib/constants";
 import { getProductById } from "@/lib/products";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, isSafeImageUrl } from "@/lib/utils";
 
 type Params = {
   id: string;
@@ -44,7 +44,7 @@ export default async function ProductDetailPage({
       id: image.id,
       image_url: image.image_url,
     })),
-  ];
+  ].filter((image) => isSafeImageUrl(image.image_url));
 
   const checkoutAt = new Intl.DateTimeFormat("id-ID", {
     dateStyle: "full",

@@ -13,6 +13,28 @@ export function formatCurrency(value: number) {
   }).format(value);
 }
 
+export function isSafeImageUrl(value: string | null | undefined) {
+  if (!value) {
+    return false;
+  }
+
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return false;
+  }
+
+  if (trimmed.startsWith("/")) {
+    return true;
+  }
+
+  try {
+    const url = new URL(trimmed);
+    return url.protocol === "https:" || url.protocol === "http:";
+  } catch {
+    return false;
+  }
+}
+
 export function toSlug(value: string) {
   const normalized = value
     .toLowerCase()

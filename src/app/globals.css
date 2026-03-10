@@ -141,6 +141,35 @@ body::after {
   box-shadow: 0 18px 28px rgb(6 40 78 / 58%);
 }
 
+.neo-btn-whatsapp-admin {
+  position: relative;
+  border-radius: 9999px;
+  border: 1px solid rgb(186 255 225 / 84%);
+  background: linear-gradient(105deg, #6dffb2 0%, #39dc8f 48%, #3cc4ff 100%);
+  color: #032329;
+  font-weight: 800;
+  box-shadow:
+    0 18px 36px rgb(5 33 57 / 60%),
+    0 0 0 1px rgb(206 255 235 / 28%),
+    0 0 28px rgb(102 255 191 / 35%);
+  transition: transform 220ms ease, box-shadow 220ms ease, filter 220ms ease;
+  animation: ctaPulse 2.8s ease-in-out infinite;
+}
+
+.neo-btn-whatsapp-admin:hover {
+  transform: translateY(-1px) scale(1.01);
+  filter: saturate(1.08);
+  box-shadow:
+    0 22px 40px rgb(5 33 57 / 65%),
+    0 0 0 1px rgb(206 255 235 / 36%),
+    0 0 34px rgb(102 255 191 / 42%);
+}
+
+.neo-btn-whatsapp-admin:focus-visible {
+  outline: 2px solid rgb(223 255 244 / 90%);
+  outline-offset: 2px;
+}
+
 .neo-btn-outline {
   border-radius: 9999px;
   border: 1px solid rgb(115 200 255 / 52%);
@@ -250,5 +279,27 @@ body::after {
   }
   to {
     transform: translateX(38%) rotate(5deg);
+  }
+}
+
+@keyframes ctaPulse {
+  0%,
+  100% {
+    box-shadow:
+      0 18px 36px rgb(5 33 57 / 60%),
+      0 0 0 1px rgb(206 255 235 / 28%),
+      0 0 24px rgb(102 255 191 / 30%);
+  }
+  50% {
+    box-shadow:
+      0 20px 38px rgb(5 33 57 / 64%),
+      0 0 0 1px rgb(206 255 235 / 32%),
+      0 0 34px rgb(102 255 191 / 45%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .neo-btn-whatsapp-admin {
+    animation: none;
   }
 }

@@ -6,10 +6,12 @@ import {
   ForumIcon,
   ProductsIcon,
   ShopeeIcon,
+  UserIcon,
   WhatsappIcon,
 } from "@/components/ui/app-icons";
 import { getLatestProducts } from "@/lib/products";
 import {
+  ADMIN_WHATSAPP_NUMBER,
   SHOPEE_STORE_URL,
   WHATSAPP_GROUP_FORUM,
   WHATSAPP_GROUP_MAIN,
@@ -17,6 +19,7 @@ import {
 
 export default async function HomePage() {
   const latestProducts = await getLatestProducts(6);
+  const personalWhatsappUrl = `https://wa.me/${ADMIN_WHATSAPP_NUMBER}`;
 
   return (
     <div className="space-y-10 sm:space-y-14">
@@ -38,6 +41,15 @@ export default async function HomePage() {
                 <div className="absolute -top-8 -right-8 h-24 w-24 rounded-full bg-cyan-300/18 blur-2xl" />
                 <div className="relative space-y-2.5">
                   <div className="grid gap-2">
+                    <a
+                      href={personalWhatsappUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="neo-btn-whatsapp-admin inline-flex min-h-12 w-full items-center justify-center gap-2.5 px-5 py-2.5 text-[0.95rem] font-extrabold"
+                    >
+                      <UserIcon className="h-5 w-5 text-emerald-950/85" aria-hidden="true" />
+                      Chat WhatsApp Admin
+                    </a>
                     <Link
                       href="/products"
                       className="neo-btn-primary inline-flex min-h-11 w-full items-center justify-center gap-2 px-5 py-2 text-sm"
@@ -82,6 +94,15 @@ export default async function HomePage() {
 
             <div className="hidden sm:block">
               <div className="flex flex-wrap gap-2.5">
+                <a
+                  href={personalWhatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="neo-btn-whatsapp-admin inline-flex min-h-12 w-full basis-full items-center justify-center gap-2.5 px-7 py-3 text-base font-extrabold"
+                >
+                  <UserIcon className="h-5 w-5 text-emerald-950/85" aria-hidden="true" />
+                  Chat WhatsApp Admin
+                </a>
                 <Link
                   href="/products"
                   className="neo-btn-primary inline-flex w-full items-center justify-center gap-2 px-5 py-2 text-sm sm:w-auto"
@@ -124,11 +145,11 @@ export default async function HomePage() {
           <div className="space-y-4">
             <div className="hero-logo-shell relative mx-auto h-[220px] w-[220px] overflow-hidden sm:h-[280px] sm:w-[280px] lg:h-[320px] lg:w-[320px]">
               <Image
-                src="/logo-clean.png"
+                src="/logo.png"
                 alt="Logo Gii.Diecast"
                 fill
                 sizes="(max-width: 640px) 220px, (max-width: 1024px) 280px, 320px"
-                className="object-cover"
+                className="rounded-full object-contain object-center p-2 sm:p-3"
                 priority
               />
             </div>
@@ -151,10 +172,6 @@ export default async function HomePage() {
             <h2 className="display-font text-3xl text-white sm:text-4xl">
               Produk Terbaru
             </h2>
-            <p className="muted-text max-w-xl text-sm">
-              Koleksi update terbaru dari Gii.Diecast. Setiap item bisa dicek
-              status stock, limited tag, dan detail foto.
-            </p>
           </div>
           <Link
             href="/products"

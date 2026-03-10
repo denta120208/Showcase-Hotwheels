@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { cache } from "react";
 import type { User } from "@supabase/supabase-js";
 
@@ -17,23 +18,37 @@ async function getCurrentUserProfileBySelect<TProfile extends Partial<UserProfil
     return { user: null, profile: null as TProfile | null };
   }
 
-  const supabase = await createServerSupabaseClient();
+  const cookieStore = await cookies();
+  const hasAuthCookie = cookieStore
+    .getAll()
+    .some(
+      ({ name }) => name.startsWith("sb-") && name.includes("auth-token"),
+    );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  if (!hasAuthCookie) {
     return { user: null, profile: null as TProfile | null };
   }
 
-  const { data: profile } = await supabase
-    .from("users")
-    .select(select)
-    .eq("id", user.id)
-    .maybeSingle();
+  try {
+    const supabase = await createServerSupabaseClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  return { user, profile: (profile ?? null) as TProfile | null };
+    if (!user) {
+      return { user: null, profile: null as TProfile | null };
+    }
+
+    const { data: profile } = await supabase
+      .from("users")
+      .select(select)
+      .eq("id", user.id)
+      .maybeSingle();
+
+    return { user, profile: (profile ?? null) as TProfile | null };
+  } catch {
+    return { user: null, profile: null as TProfile | null };
+  }
 }
 
 const getCurrentUserBasicProfileCached = cache(() =>

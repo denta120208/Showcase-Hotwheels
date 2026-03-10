@@ -9,7 +9,13 @@ export function SiteFooter() {
       <div className="mx-auto grid w-full max-w-6xl gap-5 px-4 py-8 sm:px-6 lg:grid-cols-[1.2fr_1fr] lg:px-8">
         <div className="flex items-center gap-3">
           <div className="hero-logo-shell relative h-12 w-12 overflow-hidden">
-            <Image src="/logo-clean.png" alt="Logo GII.Diecast" fill sizes="48px" />
+            <Image
+              src="/logo.png"
+              alt="Logo GII.Diecast"
+              fill
+              sizes="48px"
+              className="scale-[1.02] rounded-full object-cover object-[46%_50%]"
+            />
           </div>
           <div className="min-w-0">
             <p className="display-font truncate text-xl leading-none text-white">

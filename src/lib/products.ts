@@ -25,15 +25,19 @@ export async function getLatestProducts(limit = 6) {
     return [];
   }
 
-  const supabase = await createServerSupabaseClient();
+  try {
+    const supabase = await createServerSupabaseClient();
 
-  const { data } = await supabase
-    .from("products")
-    .select("id,name,price,image_url,stock,is_limited,is_soldout")
-    .order("created_at", { ascending: false })
-    .limit(limit);
+    const { data } = await supabase
+      .from("products")
+      .select("id,name,price,image_url,stock,is_limited,is_soldout")
+      .order("created_at", { ascending: false })
+      .limit(limit);
 
-  return (data ?? []) as ProductCardItem[];
+    return (data ?? []) as ProductCardItem[];
+  } catch {
+    return [];
+  }
 }
 
 export async function getPaginatedProducts({
@@ -49,50 +53,55 @@ export async function getPaginatedProducts({
 }): Promise<ProductListResult> {
   const safePage = page < 1 ? 1 : page;
   const safePageSize = pageSize < 1 ? 12 : pageSize;
-
-  if (!hasSupabaseEnv()) {
-    return {
-      items: [],
-      page: safePage,
-      pageSize: safePageSize,
-      totalCount: 0,
-      totalPages: 1,
-    };
-  }
-
-  const supabase = await createServerSupabaseClient();
-  const from = (safePage - 1) * safePageSize;
-  const to = from + safePageSize - 1;
-
-  let query = supabase
-    .from("products")
-    .select("id,name,price,image_url,stock,is_limited,is_soldout", { count: "exact" })
-    .order("created_at", { ascending: false })
-    .range(from, to);
-
-  if (search.trim()) {
-    query = query.ilike("name", `%${search.trim()}%`);
-  }
-
-  if (filter === "ready") {
-    query = query.eq("is_soldout", false);
-  } else if (filter === "soldout") {
-    query = query.eq("is_soldout", true);
-  } else if (filter === "limited") {
-    query = query.eq("is_limited", true);
-  }
-
-  const { data, count } = await query;
-  const totalCount = count ?? 0;
-  const totalPages = Math.max(1, Math.ceil(totalCount / safePageSize));
-
-  return {
-    items: (data ?? []) as ProductCardItem[],
+  const emptyResult: ProductListResult = {
+    items: [],
     page: safePage,
     pageSize: safePageSize,
-    totalCount,
-    totalPages,
+    totalCount: 0,
+    totalPages: 1,
   };
+
+  if (!hasSupabaseEnv()) {
+    return emptyResult;
+  }
+
+  try {
+    const supabase = await createServerSupabaseClient();
+    const from = (safePage - 1) * safePageSize;
+    const to = from + safePageSize - 1;
+
+    let query = supabase
+      .from("products")
+      .select("id,name,price,image_url,stock,is_limited,is_soldout", { count: "exact" })
+      .order("created_at", { ascending: false })
+      .range(from, to);
+
+    if (search.trim()) {
+      query = query.ilike("name", `%${search.trim()}%`);
+    }
+
+    if (filter === "ready") {
+      query = query.eq("is_soldout", false);
+    } else if (filter === "soldout") {
+      query = query.eq("is_soldout", true);
+    } else if (filter === "limited") {
+      query = query.eq("is_limited", true);
+    }
+
+    const { data, count } = await query;
+    const totalCount = count ?? 0;
+    const totalPages = Math.max(1, Math.ceil(totalCount / safePageSize));
+
+    return {
+      items: (data ?? []) as ProductCardItem[],
+      page: safePage,
+      pageSize: safePageSize,
+      totalCount,
+      totalPages,
+    };
+  } catch {
+    return emptyResult;
+  }
 }
 
 export async function getProductById(productId: number) {
@@ -100,26 +109,30 @@ export async function getProductById(productId: number) {
     return null;
   }
 
-  const supabase = await createServerSupabaseClient();
+  try {
+    const supabase = await createServerSupabaseClient();
 
-  const { data: product } = await supabase
-    .from("products")
-    .select("id,name,price,description,image_url,stock,is_limited,is_soldout")
-    .eq("id", productId)
-    .maybeSingle();
+    const { data: product } = await supabase
+      .from("products")
+      .select("id,name,price,description,image_url,stock,is_limited,is_soldout")
+      .eq("id", productId)
+      .maybeSingle();
 
-  if (!product) {
+    if (!product) {
+      return null;
+    }
+
+    const { data: images } = await supabase
+      .from("product_images")
+      .select("id,image_url")
+      .eq("product_id", productId)
+      .order("sort_order", { ascending: true });
+
+    return {
+      product: product as ProductDetailItem,
+      images: (images ?? []) as ProductDetailImage[],
+    };
+  } catch {
     return null;
   }
-
-  const { data: images } = await supabase
-    .from("product_images")
-    .select("id,image_url")
-    .eq("product_id", productId)
-    .order("sort_order", { ascending: true });
-
-  return {
-    product: product as ProductDetailItem,
-    images: (images ?? []) as ProductDetailImage[],
-  };
 }

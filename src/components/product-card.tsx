@@ -2,21 +2,22 @@ import Image from "next/image";
 import Link from "next/link";
 
 import type { ProductCardItem } from "@/lib/products";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, isSafeImageUrl } from "@/lib/utils";
 
 export function ProductCard({ product }: { product: ProductCardItem }) {
   const isSoldOut = product.is_soldout;
+  const hasImage = isSafeImageUrl(product.image_url);
 
   return (
     <article className="product-card panel group overflow-hidden rounded-3xl border border-blue-200/20">
       <Link href={`/products/${product.id}`} className="block h-full">
         <div className="relative aspect-[4/3] w-full overflow-hidden border-b border-blue-100/15 bg-slate-950/50">
-          {product.image_url ? (
+          {hasImage ? (
             <>
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/82 via-slate-950/35 to-sky-900/16" />
               <div className="absolute inset-3 overflow-hidden rounded-2xl border border-white/12 bg-black/26 shadow-[0_14px_30px_rgba(2,8,20,0.44)]">
                 <Image
-                  src={product.image_url}
+                  src={product.image_url as string}
                   alt={product.name}
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

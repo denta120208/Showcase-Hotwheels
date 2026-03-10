@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 
-import { FloatingWhatsappButton } from "@/components/floating-whatsapp";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { WebVitalsReporter } from "@/components/web-vitals-reporter";
@@ -34,7 +33,6 @@ export default function RootLayout({
           {children}
         </main>
         <SiteFooter />
-        <FloatingWhatsappButton />
       </body>
     </html>
   );
