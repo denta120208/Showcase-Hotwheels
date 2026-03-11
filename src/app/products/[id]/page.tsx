@@ -86,35 +86,38 @@ export default async function ProductDetailPage({
     <div className="grid gap-4 sm:gap-5 lg:grid-cols-[1.1fr_1fr]">
       <section className="panel rounded-3xl border border-blue-200/20 p-3 sm:p-6">
         {gallery.length > 0 ? (
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {gallery.map((image, index) => (
-              <a
-                key={`${image.id}-${index}`}
-                href={image.image_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                title="Klik untuk melihat gambar ukuran asli"
-                className={`relative overflow-hidden rounded-2xl border border-blue-100/20 bg-black/40 ${
-                  index === 0 ? "aspect-[16/10] sm:col-span-2" : "aspect-square"
-                }`}
-              >
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-900/20 to-sky-900/12" />
-                <div className="absolute inset-2 overflow-hidden rounded-xl border border-white/10 bg-black/25">
-                  <Image
-                    src={image.image_url}
-                    alt={`${product.name} ${index + 1}`}
-                    fill
-                    sizes="(max-width: 640px) 100vw, 50vw"
-                    quality={72}
-                    priority={index === 0}
-                    className="object-contain p-2 transition duration-300 hover:scale-[1.02]"
-                  />
-                </div>
-                <span className="absolute right-3 bottom-3 rounded-full border border-sky-200/45 bg-sky-400/20 px-2.5 py-1 text-[10px] font-semibold text-sky-100">
-                 Lihat Gambar
-                </span>
-              </a>
-            ))}
+          <div className="space-y-3">
+            <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth pb-1">
+              {gallery.map((image, index) => (
+                <a
+                  key={`${image.id}-${index}`}
+                  href={image.image_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Klik untuk melihat gambar ukuran asli"
+                  className="relative aspect-[16/10] w-full shrink-0 snap-center overflow-hidden rounded-2xl border border-blue-100/20 bg-black/40"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-900/20 to-sky-900/12" />
+                  <div className="absolute inset-2 overflow-hidden rounded-xl border border-white/10 bg-black/25">
+                    <Image
+                      src={image.image_url}
+                      alt={`${product.name} ${index + 1}`}
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                      quality={72}
+                      priority={index === 0}
+                      className="object-contain p-2 transition duration-300 hover:scale-[1.02]"
+                    />
+                  </div>
+                  <span className="absolute right-3 bottom-3 rounded-full border border-sky-200/45 bg-sky-400/20 px-2.5 py-1 text-[10px] font-semibold text-sky-100">
+                    Lihat Gambar
+                  </span>
+                </a>
+              ))}
+            </div>
+            {gallery.length > 1 ? (
+              <p className="text-xs text-slate-300">Geser untuk lihat foto lainnya.</p>
+            ) : null}
           </div>
         ) : (
           <div className="flex h-80 items-center justify-center rounded-2xl border border-blue-100/15 bg-slate-950/40 text-sm text-slate-300">

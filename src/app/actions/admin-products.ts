@@ -17,6 +17,7 @@ const IMAGE_UPLOAD_WEBP_QUALITY = Number.parseInt(
   process.env.IMAGE_UPLOAD_WEBP_QUALITY ?? "90",
   10,
 );
+const IMAGE_UPLOAD_MAX_BYTES = 3 * 1024 * 1024;
 
 function toBool(value: FormDataEntryValue | null) {
   if (!value) {
@@ -62,6 +63,12 @@ function getWebpQuality() {
     return 90;
   }
   return Math.min(100, Math.max(70, IMAGE_UPLOAD_WEBP_QUALITY));
+}
+
+function ensureImageSize(file: File, path: string) {
+  if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
+    redirectWithError(path, "Ukuran foto maksimal 3 MB. Silakan kompres foto.");
+  }
 }
 
 async function prepareImageUpload(file: File) {
@@ -173,6 +180,8 @@ export async function createProductAction(formData: FormData) {
     );
   }
 
+  ensureImageSize(coverImage, "/admin/products/new");
+
   const slug = toSlug(name) || `produk-${Date.now()}`;
 
   const uploadedCover = await uploadImage(coverImage, "cover");
@@ -210,6 +219,7 @@ export async function createProductAction(formData: FormData) {
     }[] = [];
 
     for (const [index, file] of galleryFiles.entries()) {
+      ensureImageSize(file, "/admin/products/new");
       const uploaded = await uploadImage(file, "gallery");
       insertedRows.push({
         product_id: product.id,
@@ -294,6 +304,7 @@ export async function updateProductAction(formData: FormData) {
   };
 
   if (newCoverImage instanceof File && newCoverImage.size > 0) {
+    ensureImageSize(newCoverImage, `/admin/products/${productId}/edit`);
     const uploadedCover = await uploadImage(newCoverImage, "cover");
     updates.image_url = uploadedCover.publicUrl;
     updates.image_path = uploadedCover.path;
@@ -351,6 +362,7 @@ export async function updateProductAction(formData: FormData) {
     }[] = [];
 
     for (const [index, file] of galleryFiles.entries()) {
+      ensureImageSize(file, `/admin/products/${productId}/edit`);
       const uploaded = await uploadImage(file, "gallery");
       newRows.push({
         product_id: productId,

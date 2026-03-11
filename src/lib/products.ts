@@ -2,10 +2,13 @@ import { createServerSupabaseClient, hasSupabaseEnv } from "./supabase/server";
 import type { Product, ProductImage } from "./supabase/types";
 
 export type ProductFilter = "all" | "ready" | "soldout" | "limited";
+export type ProductCardImage = Pick<ProductImage, "id" | "image_url" | "sort_order">;
 export type ProductCardItem = Pick<
   Product,
   "id" | "name" | "price" | "image_url" | "stock" | "is_limited" | "is_soldout"
->;
+> & {
+  product_images?: ProductCardImage[] | null;
+};
 export type ProductDetailItem = Pick<
   Product,
   "id" | "name" | "price" | "description" | "image_url" | "stock" | "is_limited" | "is_soldout"
@@ -30,8 +33,11 @@ export async function getLatestProducts(limit = 6) {
 
     const { data } = await supabase
       .from("products")
-      .select("id,name,price,image_url,stock,is_limited,is_soldout")
+      .select(
+        "id,name,price,image_url,stock,is_limited,is_soldout,product_images(id,image_url,sort_order)",
+      )
       .order("created_at", { ascending: false })
+      .order("sort_order", { referencedTable: "product_images", ascending: true })
       .limit(limit);
 
     return (data ?? []) as ProductCardItem[];
@@ -72,8 +78,12 @@ export async function getPaginatedProducts({
 
     let query = supabase
       .from("products")
-      .select("id,name,price,image_url,stock,is_limited,is_soldout", { count: "exact" })
+      .select(
+        "id,name,price,image_url,stock,is_limited,is_soldout,product_images(id,image_url,sort_order)",
+        { count: "exact" },
+      )
       .order("created_at", { ascending: false })
+      .order("sort_order", { referencedTable: "product_images", ascending: true })
       .range(from, to);
 
     if (search.trim()) {

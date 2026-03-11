@@ -1,6 +1,8 @@
 import Link from "next/link";
 
 import { createProductAction } from "@/app/actions/admin-products";
+import { GalleryImageInputs } from "@/components/admin/gallery-image-inputs";
+import { ValidatedImageInput } from "@/components/admin/validated-image-input";
 import { requireAdmin } from "@/lib/auth";
 import { getFirstParam } from "@/lib/utils";
 
@@ -38,7 +40,10 @@ export default async function NewProductPage({
           </div>
         ) : null}
 
-        <form action={createProductAction} className="mt-5 grid gap-3 sm:gap-4 md:grid-cols-2">
+        <form
+          action={createProductAction}
+          className="mt-5 grid gap-3 sm:gap-4 md:grid-cols-2"
+        >
           <div className="space-y-1 md:col-span-2">
             <label htmlFor="name" className="text-xs font-semibold text-slate-200">
               Nama Produk
@@ -102,13 +107,11 @@ export default async function NewProductPage({
             >
               Cover Image (wajib)
             </label>
-            <input
+            <ValidatedImageInput
               id="cover_image"
               name="cover_image"
-              type="file"
-              accept="image/*"
               required
-              className="w-full rounded-xl border border-blue-100/20 bg-slate-950/40 px-4 py-2.5 text-sm text-slate-200 file:mb-2 file:mr-0 file:w-full file:rounded-lg file:border-0 file:bg-sky-400 file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-slate-900 sm:file:mb-0 sm:file:mr-3 sm:file:w-auto sm:file:py-1"
+              hint="Maks 3 MB per foto. Jika lebih, kompres terlebih dahulu."
             />
           </div>
 
@@ -119,14 +122,7 @@ export default async function NewProductPage({
             >
               Gallery Images (opsional)
             </label>
-            <input
-              id="gallery_images"
-              name="gallery_images"
-              type="file"
-              accept="image/*"
-              multiple
-              className="w-full rounded-xl border border-blue-100/20 bg-slate-950/40 px-4 py-2.5 text-sm text-slate-200 file:mb-2 file:mr-0 file:w-full file:rounded-lg file:border-0 file:bg-sky-400 file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-slate-900 sm:file:mb-0 sm:file:mr-3 sm:file:w-auto sm:file:py-1"
-            />
+            <GalleryImageInputs idBase="gallery_images" />
           </div>
 
           <label className="flex items-center gap-2 text-sm text-slate-200">
