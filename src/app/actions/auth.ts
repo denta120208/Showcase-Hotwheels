@@ -154,55 +154,30 @@ export async function registerAction(formData: FormData) {
   const supabase = await createServerSupabaseClient();
   const admin = createAdminSupabaseClient();
 
-  const { data, error } = await supabase.auth.signUp({
+  const { data: created, error: createError } = await admin.auth.admin.createUser({
     email,
     password,
-    options: {
-      data: {
-        name,
-      },
+    email_confirm: true,
+    user_metadata: {
+      name,
     },
   });
 
-  let userId = data.user?.id ?? null;
-  let hasSession = Boolean(data.session);
-  let fallbackUsed = false;
-
-  if (error || !data.user) {
-    const message = error?.message.toLowerCase() ?? "";
-    const shouldFallback =
-      message.includes("rate limit exceeded") || message.includes("is invalid");
-
-    if (!shouldFallback) {
-      redirectWithError("/auth/register", error?.message ?? "Gagal membuat user di Supabase.");
-    }
-
-    const { data: created, error: createError } = await admin.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true,
-      user_metadata: {
-        name,
-      },
-    });
-
-    if (createError || !created.user) {
-      redirectWithError(
-        "/auth/register",
-        createError?.message ?? "Gagal membuat user fallback di Supabase.",
-      );
-    }
-
-    userId = created.user.id;
-    fallbackUsed = true;
-
-    const { data: signedIn } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    hasSession = Boolean(signedIn.user);
+  if (createError || !created.user) {
+    redirectWithError(
+      "/auth/register",
+      createError?.message ?? "Gagal membuat user di Supabase.",
+    );
   }
+
+  const userId = created.user.id;
+
+  const { data: signedIn } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  const hasSession = Boolean(signedIn.user);
 
   if (!userId) {
     redirectWithError("/auth/register", "Gagal membuat user di Supabase.");
@@ -230,16 +205,9 @@ export async function registerAction(formData: FormData) {
     );
   }
 
-  if (fallbackUsed) {
-    redirectWithMessage(
-      "/auth/login",
-      "Akun berhasil dibuat. Login lalu isi alamat wajib sebelum akses produk.",
-    );
-  }
-
   redirectWithMessage(
     "/auth/login",
-    "Akun berhasil dibuat. Silakan cek email verifikasi, lalu login untuk isi alamat wajib.",
+    "Akun berhasil dibuat. Silakan login untuk isi alamat wajib.",
   );
 }
 
