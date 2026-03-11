@@ -4,7 +4,13 @@ import { ProductCardCarousel } from "@/components/product-card-carousel";
 import type { ProductCardItem } from "@/lib/products";
 import { formatCurrency, isSafeImageUrl } from "@/lib/utils";
 
-export function ProductCard({ product }: { product: ProductCardItem }) {
+export function ProductCard({
+  product,
+  priorityImage = false,
+}: {
+  product: ProductCardItem;
+  priorityImage?: boolean;
+}) {
   const isSoldOut = product.is_soldout;
   const galleryItems: Array<{ key: string; url: string; label: string }> = [];
   const seenUrls = new Set<string>();
@@ -41,7 +47,7 @@ export function ProductCard({ product }: { product: ProductCardItem }) {
           <>
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/82 via-slate-950/35 to-sky-900/16" />
             <div className="absolute inset-3 overflow-hidden rounded-2xl border border-white/12 bg-black/26 shadow-[0_14px_30px_rgba(2,8,20,0.44)]">
-              <ProductCardCarousel images={galleryItems} />
+              <ProductCardCarousel images={galleryItems} priorityImage={priorityImage} />
             </div>
           </>
         ) : (

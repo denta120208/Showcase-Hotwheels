@@ -15,6 +15,8 @@ export type ProductDetailItem = Pick<
 >;
 export type ProductDetailImage = Pick<ProductImage, "id" | "image_url">;
 
+const PRODUCT_CARD_GALLERY_LIMIT = 6;
+
 export interface ProductListResult {
   items: ProductCardItem[];
   page: number;
@@ -38,6 +40,7 @@ export async function getLatestProducts(limit = 6) {
       )
       .order("created_at", { ascending: false })
       .order("sort_order", { referencedTable: "product_images", ascending: true })
+      .limit(PRODUCT_CARD_GALLERY_LIMIT, { referencedTable: "product_images" })
       .limit(limit);
 
     return (data ?? []) as ProductCardItem[];
@@ -84,6 +87,7 @@ export async function getPaginatedProducts({
       )
       .order("created_at", { ascending: false })
       .order("sort_order", { referencedTable: "product_images", ascending: true })
+      .limit(PRODUCT_CARD_GALLERY_LIMIT, { referencedTable: "product_images" })
       .range(from, to);
 
     if (search.trim()) {

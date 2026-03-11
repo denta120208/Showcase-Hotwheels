@@ -11,9 +11,13 @@ type CarouselImage = {
 
 type ProductCardCarouselProps = {
   images: CarouselImage[];
+  priorityImage?: boolean;
 };
 
-export function ProductCardCarousel({ images }: ProductCardCarouselProps) {
+export function ProductCardCarousel({
+  images,
+  priorityImage = false,
+}: ProductCardCarouselProps) {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const hasMultiple = images.length > 1;
@@ -60,21 +64,32 @@ export function ProductCardCarousel({ images }: ProductCardCarouselProps) {
 
   const imageNodes = useMemo(
     () =>
-      images.map((image, index) => (
-        <div key={image.key} className="relative h-full w-full shrink-0 snap-start">
-          <Image
-            src={image.url}
-            alt={image.label}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            quality={70}
-            className="object-contain p-2.5 transition duration-500 group-hover:scale-[1.03]"
-            priority={index === 0}
-            onLoadingComplete={updateActiveIndex}
-          />
-        </div>
-      )),
-    [images, updateActiveIndex],
+      images.map((image, index) => {
+        const shouldRender =
+          index === 0 ||
+          Math.abs(index - activeIndex) <= 1 ||
+          (priorityImage && index === 0);
+
+        return (
+          <div key={image.key} className="relative h-full w-full shrink-0 snap-start">
+            {shouldRender ? (
+              <Image
+                src={image.url}
+                alt={image.label}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                quality={70}
+                className="object-contain p-2.5 transition duration-500 group-hover:scale-[1.03]"
+                priority={priorityImage && index === 0}
+                onLoadingComplete={updateActiveIndex}
+              />
+            ) : (
+              <div className="absolute inset-0 bg-slate-950/40" />
+            )}
+          </div>
+        );
+      }),
+    [images, activeIndex, priorityImage, updateActiveIndex],
   );
 
   return (
