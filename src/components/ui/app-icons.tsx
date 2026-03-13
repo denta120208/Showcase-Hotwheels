@@ -69,6 +69,29 @@ export function WhatsappIcon(props: IconProps) {
   );
 }
 
+export function InstagramIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} {...props}>
+      <rect x="4" y="4" width="16" height="16" rx="4" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="12" cy="12" r="3.6" />
+      <circle cx="17.2" cy="6.8" r="1" />
+    </svg>
+  );
+}
+
+export function TiktokIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} {...props}>
+      <path
+        d="M14 4v10.2a3.5 3.5 0 1 1-2-3.15V7.2l7-2v4.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path d="M14 7.2l7-2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 export function ShopeeIcon(props: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} {...props}>
@@ -108,6 +131,16 @@ export function WalletIcon(props: IconProps) {
       <path d="M4 8.5A2.5 2.5 0 0 1 6.5 6H18a2 2 0 0 1 2 2v2H4v-1.5Z" strokeLinecap="round" strokeLinejoin="round" />
       <path d="M4 10h16v8a2 2 0 0 1-2 2H6.5A2.5 2.5 0 0 1 4 17.5V10Z" strokeLinecap="round" strokeLinejoin="round" />
       <path d="M15 14h5v3h-5a1.5 1.5 0 0 1 0-3Z" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function CartIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} {...props}>
+      <path d="M3 5h2l1.6 10.2A2 2 0 0 0 8.6 17h9.6a2 2 0 0 0 2-1.6L21 8H6.2" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="9" cy="20" r="1.4" />
+      <circle cx="18" cy="20" r="1.4" />
     </svg>
   );
 }

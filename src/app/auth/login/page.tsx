@@ -38,14 +38,15 @@ export default async function LoginPage({
         <form action={loginAction} className="mt-5 space-y-3">
           <input type="hidden" name="intent" value="user" />
           <div className="space-y-1">
-            <label htmlFor="email" className="text-xs font-semibold text-slate-200">
-              Email
+            <label htmlFor="username" className="text-xs font-semibold text-slate-200">
+              Username
             </label>
             <input
-              id="email"
-              name="email"
-              type="email"
+              id="username"
+              name="username"
+              type="text"
               required
+              placeholder="contoh: gii_diego"
               className="w-full rounded-xl border border-blue-100/20 bg-slate-950/40 px-4 py-2.5 text-sm text-white outline-none focus:border-sky-300/60"
             />
           </div>

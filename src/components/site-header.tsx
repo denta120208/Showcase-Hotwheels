@@ -3,24 +3,26 @@ import Link from "next/link";
 
 import { logoutAction } from "@/app/actions/auth";
 import {
+  CartIcon,
   HomeIcon,
   PaymentIcon,
   ProductsIcon,
   ShippingIcon,
 } from "@/components/ui/app-icons";
 import { getCurrentUserWithProfile } from "@/lib/auth";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { hasCompletedAddressProfile } from "@/lib/user-profile";
 
 const homeLink = { href: "/", label: "Home", icon: HomeIcon };
 const catalogLinks = [
   { href: "/", label: "Home", icon: HomeIcon },
   { href: "/products", label: "Produk", icon: ProductsIcon },
-  { href: "/payment", label: "Payment", icon: PaymentIcon },
+  { href: "/payment", label: "Payment Method", icon: PaymentIcon },
   { href: "/shipping", label: "Pengiriman", icon: ShippingIcon },
 ];
 
 export async function SiteHeader() {
-  const { profile } = await getCurrentUserWithProfile();
+  const { user, profile } = await getCurrentUserWithProfile();
   const isAdmin = profile?.role === "admin";
   const addressCompleted = hasCompletedAddressProfile(profile);
   const navLinks = isAdmin
@@ -31,9 +33,28 @@ export async function SiteHeader() {
         : [homeLink]
       : catalogLinks;
 
+  let cartQty = 0;
+  const showCartLink = !isAdmin && (!profile || addressCompleted);
+  if (user && showCartLink) {
+    try {
+      const supabase = await createServerSupabaseClient();
+      const { data: cartRows } = await supabase
+        .from("cart_items")
+        .select("quantity")
+        .eq("user_id", user.id);
+
+      cartQty = (cartRows ?? []).reduce(
+        (sum, row) => sum + (typeof row.quantity === "number" ? row.quantity : 0),
+        0,
+      );
+    } catch {
+      cartQty = 0;
+    }
+  }
+
   return (
     <header className="sticky top-0 z-50 border-b border-blue-200/15 bg-[#020a1d]/84 backdrop-blur-md">
-      <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center gap-3 px-4 py-3 sm:px-6 lg:flex-nowrap lg:px-8">
+      <div className="flex w-full flex-wrap items-center gap-3 px-4 py-3 sm:px-6 lg:flex-nowrap lg:px-8">
         <Link href="/" className="group flex min-w-0 items-center gap-3">
           <div className="hero-logo-shell relative h-12 w-12 overflow-hidden transition duration-200 group-hover:scale-[1.03]">
             <Image
@@ -56,6 +77,21 @@ export async function SiteHeader() {
         </Link>
 
         <div className="order-2 ml-auto flex items-center gap-2 lg:order-3">
+          {showCartLink ? (
+            <Link
+              href="/cart"
+              className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/45 bg-emerald-400/12 px-3 py-1.5 text-xs font-semibold text-emerald-100 hover:bg-emerald-400/20"
+              aria-label="Buka cart"
+            >
+              <CartIcon className="h-4 w-4" aria-hidden="true" />
+              <span className="hidden sm:inline">Cart</span>
+              {cartQty > 0 ? (
+                <span className="ml-0.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-emerald-400 px-1.5 text-[10px] font-extrabold text-emerald-950">
+                  {cartQty}
+                </span>
+              ) : null}
+            </Link>
+          ) : null}
           {profile ? (
             <>
               {isAdmin ? (
@@ -114,7 +150,7 @@ export async function SiteHeader() {
           )}
         </div>
 
-        <nav className="order-3 w-full overflow-x-auto rounded-2xl border border-blue-200/18 bg-[#0a1f46]/55 p-1.5 text-sm font-medium text-slate-100 lg:order-2 lg:mx-auto lg:w-auto lg:rounded-full">
+        <nav className="order-3 w-full overflow-x-auto rounded-2xl border border-blue-200/18 bg-[#0a1f46]/55 p-1.5 text-sm font-medium text-slate-100 lg:order-2 lg:mx-auto lg:w-auto lg:overflow-x-visible lg:rounded-full">
           <div className="flex min-w-max items-center gap-1.5">
             {navLinks.map((link) => {
               const Icon = link.icon;

@@ -1,4 +1,5 @@
 export type UserRole = "admin" | "user";
+export type ProductCategory = "diecast" | "accessories" | "diorama" | "velg";
 
 export interface Database {
   public: {
@@ -7,6 +8,7 @@ export interface Database {
         Row: {
           id: string;
           name: string;
+          username: string | null;
           phone: string | null;
           tiktok: string | null;
           address_detail: string | null;
@@ -22,6 +24,7 @@ export interface Database {
         Insert: {
           id: string;
           name?: string;
+          username?: string | null;
           phone?: string | null;
           tiktok?: string | null;
           address_detail?: string | null;
@@ -37,6 +40,7 @@ export interface Database {
         Update: {
           id?: string;
           name?: string;
+          username?: string | null;
           phone?: string | null;
           tiktok?: string | null;
           address_detail?: string | null;
@@ -64,6 +68,7 @@ export interface Database {
           id: number;
           name: string;
           slug: string;
+          category: ProductCategory;
           price: number;
           description: string | null;
           image_url: string | null;
@@ -78,6 +83,7 @@ export interface Database {
           id?: number;
           name: string;
           slug: string;
+          category?: ProductCategory;
           price: number;
           description?: string | null;
           image_url?: string | null;
@@ -92,6 +98,7 @@ export interface Database {
           id?: number;
           name?: string;
           slug?: string;
+          category?: ProductCategory;
           price?: number;
           description?: string | null;
           image_url?: string | null;
@@ -139,11 +146,57 @@ export interface Database {
           },
         ];
       };
+      cart_items: {
+        Row: {
+          id: number;
+          user_id: string;
+          product_id: number;
+          quantity: number;
+          is_selected: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: number;
+          user_id: string;
+          product_id: number;
+          quantity?: number;
+          is_selected?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: number;
+          user_id?: string;
+          product_id?: number;
+          quantity?: number;
+          is_selected?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "cart_items_product_id_fkey";
+            columns: ["product_id"];
+            isOneToOne: false;
+            referencedRelation: "products";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "cart_items_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
     Enums: {
       user_role: UserRole;
+      product_category: ProductCategory;
     };
     CompositeTypes: Record<string, never>;
   };
@@ -152,3 +205,4 @@ export interface Database {
 export type UserProfile = Database["public"]["Tables"]["users"]["Row"];
 export type Product = Database["public"]["Tables"]["products"]["Row"];
 export type ProductImage = Database["public"]["Tables"]["product_images"]["Row"];
+export type CartItem = Database["public"]["Tables"]["cart_items"]["Row"];

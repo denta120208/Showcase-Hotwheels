@@ -1,7 +1,11 @@
 import Link from "next/link";
 
 import { ProductCard } from "@/components/product-card";
-import { getPaginatedProducts, type ProductFilter } from "@/lib/products";
+import {
+  getPaginatedProducts,
+  type ProductCategoryFilter,
+  type ProductFilter,
+} from "@/lib/products";
 import { getFirstParam, toInt } from "@/lib/utils";
 
 type SearchParams = Record<string, string | string[] | undefined>;
@@ -13,13 +17,23 @@ const filterOptions: { label: string; value: ProductFilter }[] = [
   { label: "Limited", value: "limited" },
 ];
 
+const categoryOptions: { label: string; value: ProductCategoryFilter }[] = [
+  { label: "Semua Kategori", value: "all" },
+  { label: "Diecast", value: "diecast" },
+  { label: "Accessories", value: "accessories" },
+  { label: "Diorama", value: "diorama" },
+  { label: "Velg", value: "velg" },
+];
+
 function buildProductsUrl({
   q,
   filter,
+  category,
   page,
 }: {
   q: string;
   filter: ProductFilter;
+  category: ProductCategoryFilter;
   page: number;
 }) {
   const params = new URLSearchParams();
@@ -28,6 +42,9 @@ function buildProductsUrl({
   }
   if (filter !== "all") {
     params.set("filter", filter);
+  }
+  if (category !== "all") {
+    params.set("category", category);
   }
   params.set("page", String(page));
 
@@ -45,12 +62,17 @@ export default async function ProductsPage({
   const filter = filterOptions.some((item) => item.value === rawFilter)
     ? (rawFilter as ProductFilter)
     : "all";
+  const rawCategory = getFirstParam(resolved.category, "all");
+  const category = categoryOptions.some((item) => item.value === rawCategory)
+    ? (rawCategory as ProductCategoryFilter)
+    : "all";
   const page = toInt(getFirstParam(resolved.page, "1"), 1);
   const message = getFirstParam(resolved.message);
 
   const result = await getPaginatedProducts({
     search: q,
     filter,
+    category,
     page,
     pageSize: 12,
   });
@@ -77,7 +99,7 @@ export default async function ProductsPage({
           </div>
         ) : null}
 
-        <form className="mt-5 grid gap-3 md:grid-cols-[1fr_180px_auto]">
+        <form className="mt-5 grid gap-3 md:grid-cols-[1fr_180px_180px_auto]">
           <input
             type="text"
             name="q"
@@ -85,6 +107,17 @@ export default async function ProductsPage({
             placeholder="Cari nama produk..."
             className="rounded-xl border border-blue-100/20 bg-slate-950/45 px-4 py-2.5 text-sm text-white outline-none placeholder:text-slate-400 focus:border-sky-300/60"
           />
+          <select
+            name="category"
+            defaultValue={category}
+            className="rounded-xl border border-blue-100/20 bg-slate-950/45 px-4 py-2.5 text-sm text-white outline-none focus:border-sky-300/60"
+          >
+            {categoryOptions.map((option) => (
+              <option key={option.value} value={option.value} className="bg-slate-900">
+                {option.label}
+              </option>
+            ))}
+          </select>
           <select
             name="filter"
             defaultValue={filter}
@@ -128,6 +161,7 @@ export default async function ProductsPage({
           href={buildProductsUrl({
             q,
             filter,
+            category,
             page: Math.max(1, result.page - 1),
           })}
           className="neo-btn-outline px-3 py-1.5 text-xs"
@@ -138,7 +172,7 @@ export default async function ProductsPage({
         {pageNumbers.map((pageNumber) => (
           <Link
             key={pageNumber}
-            href={buildProductsUrl({ q, filter, page: pageNumber })}
+            href={buildProductsUrl({ q, filter, category, page: pageNumber })}
             className={`rounded-lg px-3 py-1.5 text-xs font-semibold ${
               pageNumber === result.page
                 ? "neo-btn-primary"
@@ -153,6 +187,7 @@ export default async function ProductsPage({
           href={buildProductsUrl({
             q,
             filter,
+            category,
             page: Math.min(result.totalPages, result.page + 1),
           })}
           className="neo-btn-outline px-3 py-1.5 text-xs"

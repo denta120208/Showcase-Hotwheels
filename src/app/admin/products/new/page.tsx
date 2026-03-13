@@ -56,6 +56,24 @@ export default async function NewProductPage({
             />
           </div>
 
+          <div className="space-y-1 md:col-span-2">
+            <label htmlFor="category" className="text-xs font-semibold text-slate-200">
+              Kategori
+            </label>
+            <select
+              id="category"
+              name="category"
+              required
+              defaultValue="diecast"
+              className="w-full rounded-xl border border-blue-100/20 bg-slate-950/40 px-4 py-2.5 text-sm text-white outline-none focus:border-sky-300/60"
+            >
+              <option value="diecast">Diecast</option>
+              <option value="accessories">Accessories</option>
+              <option value="diorama">Diorama</option>
+              <option value="velg">Velg</option>
+            </select>
+          </div>
+
           <div className="space-y-1">
             <label htmlFor="price" className="text-xs font-semibold text-slate-200">
               Harga

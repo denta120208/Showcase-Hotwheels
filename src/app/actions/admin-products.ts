@@ -6,6 +6,7 @@ import sharp from "sharp";
 
 import { requireAdmin } from "@/lib/auth";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import type { ProductCategory } from "@/lib/supabase/types";
 import { toSlug } from "@/lib/utils";
 
 const STORAGE_BUCKET = "product-images";
@@ -18,6 +19,12 @@ const IMAGE_UPLOAD_WEBP_QUALITY = Number.parseInt(
   10,
 );
 const IMAGE_UPLOAD_MAX_BYTES = 3 * 1024 * 1024;
+const PRODUCT_CATEGORY_VALUES: ProductCategory[] = [
+  "diecast",
+  "accessories",
+  "diorama",
+  "velg",
+];
 
 function toBool(value: FormDataEntryValue | null) {
   if (!value) {
@@ -44,6 +51,14 @@ function toStock(value: FormDataEntryValue | null) {
 
 function redirectWithError(path: string, message: string): never {
   redirect(`${path}?error=${encodeURIComponent(message)}`);
+}
+
+function toProductCategory(value: FormDataEntryValue | null, path: string): ProductCategory {
+  const normalized = String(value ?? "").trim().toLowerCase();
+  if (PRODUCT_CATEGORY_VALUES.includes(normalized as ProductCategory)) {
+    return normalized as ProductCategory;
+  }
+  redirectWithError(path, "Kategori tidak valid.");
 }
 
 function normalizeBaseName(fileName: string) {
@@ -156,6 +171,7 @@ export async function createProductAction(formData: FormData) {
   const admin = createAdminSupabaseClient();
 
   const name = String(formData.get("name") ?? "").trim();
+  const category = toProductCategory(formData.get("category"), "/admin/products/new");
   const description = String(formData.get("description") ?? "").trim();
   const price = toPrice(formData.get("price"));
   const stock = toStock(formData.get("stock"));
@@ -191,6 +207,7 @@ export async function createProductAction(formData: FormData) {
     .insert({
       name,
       slug,
+      category,
       description: description || null,
       price,
       stock,
@@ -250,8 +267,10 @@ export async function updateProductAction(formData: FormData) {
   if (!productId) {
     redirectWithError("/admin", "Product id tidak valid.");
   }
+  const productPath = `/admin/products/${productId}/edit`;
 
   const name = String(formData.get("name") ?? "").trim();
+  const category = toProductCategory(formData.get("category"), productPath);
   const description = String(formData.get("description") ?? "").trim();
   const price = toPrice(formData.get("price"));
   const stock = toStock(formData.get("stock"));
@@ -268,7 +287,7 @@ export async function updateProductAction(formData: FormData) {
 
   if (!name || !price) {
     redirectWithError(
-      `/admin/products/${productId}/edit`,
+      productPath,
       "Nama dan harga produk wajib diisi.",
     );
   }
@@ -286,6 +305,7 @@ export async function updateProductAction(formData: FormData) {
   const updates: {
     name: string;
     slug: string;
+    category: ProductCategory;
     description: string | null;
     price: number;
     stock: number;
@@ -296,6 +316,7 @@ export async function updateProductAction(formData: FormData) {
   } = {
     name,
     slug: toSlug(name) || `produk-${productId}`,
+    category,
     description: description || null,
     price,
     stock,
@@ -318,7 +339,7 @@ export async function updateProductAction(formData: FormData) {
 
   if (updateError) {
     redirectWithError(
-      `/admin/products/${productId}/edit`,
+      productPath,
       `Gagal update produk: ${updateError.message}`,
     );
   }

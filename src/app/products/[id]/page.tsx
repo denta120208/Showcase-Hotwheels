@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { addToCartAction } from "@/app/actions/cart";
+import { CartIcon } from "@/components/ui/app-icons";
 import { getCurrentUserWithProfile } from "@/lib/auth";
 import { ADMIN_WHATSAPP_NUMBER } from "@/lib/constants";
 import { getProductById } from "@/lib/products";
@@ -10,6 +12,22 @@ import { formatCurrency, isSafeImageUrl } from "@/lib/utils";
 type Params = {
   id: string;
 };
+
+function formatCategoryLabel(category: string) {
+  if (category === "diecast") {
+    return "Diecast";
+  }
+  if (category === "accessories") {
+    return "Accessories";
+  }
+  if (category === "diorama") {
+    return "Diorama";
+  }
+  if (category === "velg") {
+    return "Velg";
+  }
+  return category;
+}
 
 export default async function ProductDetailPage({
   params,
@@ -56,7 +74,6 @@ export default async function ProductDetailPage({
   const customerFields = [
     ["Nama Lengkap", profile?.name],
     ["No Telp", profile?.phone],
-    ["Email", profile?.email],
     ["TikTok / Instagram", profile?.tiktok],
     ["Detail Alamat", profile?.address_detail],
     ["Kota / Desa", profile?.village],
@@ -87,7 +104,7 @@ export default async function ProductDetailPage({
       <section className="panel rounded-3xl border border-blue-200/20 p-3 sm:p-6">
         {gallery.length > 0 ? (
           <div className="space-y-3">
-            <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth pb-1">
+            <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth pb-1 lg:grid lg:grid-cols-2 lg:overflow-x-visible lg:snap-none">
               {gallery.map((image, index) => (
                 <a
                   key={`${image.id}-${index}`}
@@ -138,6 +155,9 @@ export default async function ProductDetailPage({
           </div>
 
           <div className="flex flex-wrap gap-2 text-xs font-bold">
+            <span className="rounded-full border border-white/12 bg-slate-950/35 px-3 py-1 text-slate-100">
+              {formatCategoryLabel(String(product.category))}
+            </span>
             <span
               className={`rounded-full px-3 py-1 ${
                 product.is_soldout
@@ -185,14 +205,26 @@ export default async function ProductDetailPage({
               Produk Sedang Habis
             </span>
           ) : (
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex w-full justify-center rounded-xl bg-emerald-500 px-4 py-2 text-sm font-bold text-emerald-950 hover:bg-emerald-400 sm:w-auto"
-            >
-              Pesan via WhatsApp
-            </a>
+            <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
+              <form action={addToCartAction} className="w-full sm:w-auto">
+                <input type="hidden" name="product_id" value={product.id} />
+                <button
+                  type="submit"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-300/45 bg-emerald-400/12 px-4 py-2 text-sm font-bold text-emerald-100 hover:bg-emerald-400/20 sm:w-auto"
+                >
+                  <CartIcon className="h-4 w-4" aria-hidden="true" />
+                  Cart
+                </button>
+              </form>
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex w-full justify-center rounded-xl bg-emerald-500 px-4 py-2 text-sm font-bold text-emerald-950 hover:bg-emerald-400 sm:w-auto"
+              >
+                Pesan via WhatsApp
+              </a>
+            </div>
           )}
         </div>
       </section>

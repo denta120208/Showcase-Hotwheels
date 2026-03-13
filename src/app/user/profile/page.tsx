@@ -67,11 +67,21 @@ export default async function UserProfilePage({
       ? user.user_metadata.name.trim()
       : "";
 
+  const fallbackUsername =
+    typeof user.user_metadata?.username === "string"
+      ? user.user_metadata.username.trim().toLowerCase()
+      : "";
+
+  const derivedUsername =
+    !fallbackUsername && typeof user.email === "string" && user.email.endsWith("@user.gii-diecast.local")
+      ? user.email.split("@")[0] ?? ""
+      : fallbackUsername;
+
   const data = {
     name: profile?.name ?? fallbackName,
+    username: profile?.username ?? derivedUsername,
     phone: profile?.phone ?? "",
     tiktok: profile?.tiktok ?? "",
-    email: profile?.email ?? user.email ?? "",
     address_detail: profile?.address_detail ?? "",
     village: profile?.village ?? "",
     province: profile?.province ?? "",
@@ -137,10 +147,9 @@ export default async function UserProfilePage({
             defaultValue={data.tiktok}
           />
           <InputField
-            id="email"
-            label="Email"
-            type="email"
-            defaultValue={data.email}
+            id="username"
+            label="Username"
+            defaultValue={data.username}
             readOnly
           />
 

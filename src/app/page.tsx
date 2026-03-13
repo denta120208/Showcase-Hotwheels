@@ -3,17 +3,19 @@ import Link from "next/link";
 
 import { ProductCard } from "@/components/product-card";
 import {
-  ForumIcon,
+  InstagramIcon,
   ProductsIcon,
   ShopeeIcon,
+  TiktokIcon,
   UserIcon,
   WhatsappIcon,
 } from "@/components/ui/app-icons";
 import { getLatestProducts } from "@/lib/products";
 import {
   ADMIN_WHATSAPP_NUMBER,
+  INSTAGRAM_URL,
   SHOPEE_STORE_URL,
-  WHATSAPP_GROUP_FORUM,
+  TIKTOK_URL,
   WHATSAPP_GROUP_MAIN,
 } from "@/lib/constants";
 
@@ -27,6 +29,16 @@ export default async function HomePage() {
         <div className="absolute -top-16 -right-12 h-56 w-56 rounded-full bg-cyan-300/12 blur-3xl" />
         <div className="relative grid items-center gap-8 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="space-y-5">
+            <div className="hero-logo-shell relative mx-auto h-[190px] w-[190px] overflow-hidden sm:hidden">
+              <Image
+                src="/logo.png"
+                alt="Logo Gii.Diecast"
+                fill
+                sizes="190px"
+                className="rounded-full object-contain object-center p-2"
+                priority
+              />
+            </div>
             <span className="section-label">Modern Collector Store</span>
             <h1 className="display-font page-title text-white">
               Gii.<span className="brand-gradient">Diecast</span> Showcase
@@ -64,7 +76,7 @@ export default async function HomePage() {
                       rel="noopener noreferrer"
                     >
                       <WhatsappIcon className="h-4 w-4 text-emerald-100" aria-hidden="true" />
-                      Join WhatsApp Group
+                      Join Grup FlashSale
                     </a>
                   </div>
 
@@ -79,13 +91,22 @@ export default async function HomePage() {
                       Shopee Store
                     </a>
                     <a
-                      href={WHATSAPP_GROUP_FORUM}
+                      href={TIKTOK_URL}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-sky-200/35 bg-sky-400/12 px-4 py-2 text-sm font-semibold text-sky-100 transition hover:bg-sky-300/22"
+                      className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-cyan-200/35 bg-cyan-400/12 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-300/20"
                     >
-                      <ForumIcon className="h-4 w-4 text-cyan-100" aria-hidden="true" />
-                      Forum Chat WhatsApp
+                      <TiktokIcon className="h-4 w-4 text-cyan-100" aria-hidden="true" />
+                      TikTok
+                    </a>
+                    <a
+                      href={INSTAGRAM_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-pink-200/35 bg-pink-400/12 px-4 py-2 text-sm font-semibold text-pink-100 transition hover:bg-pink-300/20"
+                    >
+                      <InstagramIcon className="h-4 w-4 text-pink-100" aria-hidden="true" />
+                      Instagram
                     </a>
                   </div>
                 </div>
@@ -117,7 +138,7 @@ export default async function HomePage() {
                   rel="noopener noreferrer"
                 >
                   <WhatsappIcon className="h-4 w-4 text-emerald-200" aria-hidden="true" />
-                  Join WhatsApp Group
+                Join Grup FlashSale
                 </a>
                 <a
                   href={SHOPEE_STORE_URL}
@@ -126,24 +147,32 @@ export default async function HomePage() {
                   className="neo-btn-outline inline-flex w-full items-center justify-center gap-2 px-5 py-2 text-sm sm:w-auto"
                 >
                   <ShopeeIcon className="h-4 w-4 text-orange-200" aria-hidden="true" />
-                  Shopee Store
+                  Shopee 
+                </a>
+                <a
+                  href={TIKTOK_URL}
+                  className="neo-btn-outline inline-flex w-full items-center justify-center gap-2 px-5 py-2 text-sm sm:w-auto"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <TiktokIcon className="h-4 w-4 text-cyan-100" aria-hidden="true" />
+                  TikTok
+                </a>
+                <a
+                  href={INSTAGRAM_URL}
+                  className="neo-btn-outline inline-flex w-full items-center justify-center gap-2 px-5 py-2 text-sm sm:w-auto"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <InstagramIcon className="h-4 w-4 text-pink-200" aria-hidden="true" />
+                  Instagram
                 </a>
               </div>
-
-              <a
-                href={WHATSAPP_GROUP_FORUM}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-2 inline-flex items-center gap-2 rounded-full border border-blue-200/25 bg-blue-400/8 px-4 py-1.5 text-xs font-semibold text-slate-100 hover:bg-blue-300/16"
-              >
-                <ForumIcon className="h-4 w-4 text-cyan-100" aria-hidden="true" />
-                Forum Chat WhatsApp
-              </a>
             </div>
           </div>
 
           <div className="space-y-4">
-            <div className="hero-logo-shell relative mx-auto h-[220px] w-[220px] overflow-hidden sm:h-[280px] sm:w-[280px] lg:h-[320px] lg:w-[320px]">
+            <div className="hero-logo-shell relative mx-auto hidden h-[220px] w-[220px] overflow-hidden sm:block sm:h-[280px] sm:w-[280px] lg:h-[320px] lg:w-[320px]">
               <Image
                 src="/logo.png"
                 alt="Logo Gii.Diecast"

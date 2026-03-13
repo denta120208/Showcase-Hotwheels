@@ -65,8 +65,8 @@ export default async function RegisterPage({
         <form action={registerAction} className="mt-5 grid gap-3 md:grid-cols-2">
           <Field id="name" label="Nama Lengkap" required />
           <Field id="phone" label="No Telp" required />
+          <Field id="username" label="Username" required />
           <Field id="tiktok" label="Nama TikTok / Instagram" />
-          <Field id="email" label="Email" required type="email" />
           <PasswordField id="password" label="Password" required />
 
           <button

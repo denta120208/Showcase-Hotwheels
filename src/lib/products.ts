@@ -1,21 +1,109 @@
+import { createAdminSupabaseClient } from "./supabase/admin";
 import { createServerSupabaseClient, hasSupabaseEnv } from "./supabase/server";
-import type { Product, ProductImage } from "./supabase/types";
+import type { Product, ProductCategory, ProductImage } from "./supabase/types";
 
 export type ProductFilter = "all" | "ready" | "soldout" | "limited";
+export type ProductCategoryFilter = "all" | ProductCategory;
 export type ProductCardImage = Pick<ProductImage, "id" | "image_url" | "sort_order">;
 export type ProductCardItem = Pick<
   Product,
-  "id" | "name" | "price" | "image_url" | "stock" | "is_limited" | "is_soldout"
+  | "id"
+  | "name"
+  | "category"
+  | "price"
+  | "image_url"
+  | "stock"
+  | "is_limited"
+  | "is_soldout"
 > & {
   product_images?: ProductCardImage[] | null;
 };
 export type ProductDetailItem = Pick<
   Product,
-  "id" | "name" | "price" | "description" | "image_url" | "stock" | "is_limited" | "is_soldout"
+  | "id"
+  | "name"
+  | "category"
+  | "price"
+  | "description"
+  | "image_url"
+  | "stock"
+  | "is_limited"
+  | "is_soldout"
 >;
 export type ProductDetailImage = Pick<ProductImage, "id" | "image_url">;
 
 const PRODUCT_CARD_GALLERY_LIMIT = 6;
+const SOLDOUT_AUTO_DELETE_AFTER_MS = 24 * 60 * 60 * 1000;
+const SOLDOUT_CLEANUP_COOLDOWN_MS = 10 * 60 * 1000;
+const SOLDOUT_CLEANUP_BATCH_SIZE = 20;
+const STORAGE_BUCKET = "product-images";
+
+let lastSoldoutCleanupAt = 0;
+
+function hasSupabaseServiceRoleKey() {
+  return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY);
+}
+
+async function cleanupExpiredSoldoutProducts() {
+  const now = Date.now();
+  if (now - lastSoldoutCleanupAt < SOLDOUT_CLEANUP_COOLDOWN_MS) {
+    return;
+  }
+  lastSoldoutCleanupAt = now;
+
+  if (!hasSupabaseServiceRoleKey()) {
+    return;
+  }
+
+  const cutoff = new Date(now - SOLDOUT_AUTO_DELETE_AFTER_MS).toISOString();
+
+  try {
+    const admin = createAdminSupabaseClient();
+    const { data } = await admin
+      .from("products")
+      .select("id,image_path,product_images(image_path)")
+      .eq("is_soldout", true)
+      .lt("updated_at", cutoff)
+      .limit(SOLDOUT_CLEANUP_BATCH_SIZE);
+
+    const rows = (data ?? []) as Array<{
+      id: number;
+      image_path: string | null;
+      product_images: Array<{ image_path: string | null }> | null;
+    }>;
+
+    if (rows.length === 0) {
+      return;
+    }
+
+    const storagePaths = rows
+      .flatMap((row) => [
+        row.image_path,
+        ...(row.product_images ?? []).map((image) => image.image_path),
+      ])
+      .filter((path): path is string => Boolean(path));
+
+    const uniqueStoragePaths = Array.from(new Set(storagePaths));
+
+    if (uniqueStoragePaths.length > 0) {
+      try {
+        await admin.storage.from(STORAGE_BUCKET).remove(uniqueStoragePaths);
+      } catch {
+        // Best-effort. We still want the soldout products removed from the catalog.
+      }
+    }
+
+    await admin
+      .from("products")
+      .delete()
+      .in(
+        "id",
+        rows.map((row) => row.id),
+      );
+  } catch {
+    // Ignore cleanup failure to keep catalog fetch resilient.
+  }
+}
 
 export interface ProductListResult {
   items: ProductCardItem[];
@@ -31,12 +119,13 @@ export async function getLatestProducts(limit = 6) {
   }
 
   try {
+    await cleanupExpiredSoldoutProducts();
     const supabase = await createServerSupabaseClient();
 
     const { data } = await supabase
       .from("products")
       .select(
-        "id,name,price,image_url,stock,is_limited,is_soldout,product_images(id,image_url,sort_order)",
+        "id,name,category,price,image_url,stock,is_limited,is_soldout,product_images(id,image_url,sort_order)",
       )
       .order("created_at", { ascending: false })
       .order("sort_order", { referencedTable: "product_images", ascending: true })
@@ -52,11 +141,13 @@ export async function getLatestProducts(limit = 6) {
 export async function getPaginatedProducts({
   search = "",
   filter = "all",
+  category = "all",
   page = 1,
   pageSize = 12,
 }: {
   search?: string;
   filter?: ProductFilter;
+  category?: ProductCategoryFilter;
   page?: number;
   pageSize?: number;
 }): Promise<ProductListResult> {
@@ -75,6 +166,7 @@ export async function getPaginatedProducts({
   }
 
   try {
+    await cleanupExpiredSoldoutProducts();
     const supabase = await createServerSupabaseClient();
     const from = (safePage - 1) * safePageSize;
     const to = from + safePageSize - 1;
@@ -82,7 +174,7 @@ export async function getPaginatedProducts({
     let query = supabase
       .from("products")
       .select(
-        "id,name,price,image_url,stock,is_limited,is_soldout,product_images(id,image_url,sort_order)",
+        "id,name,category,price,image_url,stock,is_limited,is_soldout,product_images(id,image_url,sort_order)",
         { count: "exact" },
       )
       .order("created_at", { ascending: false })
@@ -100,6 +192,10 @@ export async function getPaginatedProducts({
       query = query.eq("is_soldout", true);
     } else if (filter === "limited") {
       query = query.eq("is_limited", true);
+    }
+
+    if (category !== "all") {
+      query = query.eq("category", category);
     }
 
     const { data, count } = await query;
@@ -124,11 +220,12 @@ export async function getProductById(productId: number) {
   }
 
   try {
+    await cleanupExpiredSoldoutProducts();
     const supabase = await createServerSupabaseClient();
 
     const { data: product } = await supabase
       .from("products")
-      .select("id,name,price,description,image_url,stock,is_limited,is_soldout")
+      .select("id,name,category,price,description,image_url,stock,is_limited,is_soldout")
       .eq("id", productId)
       .maybeSingle();
 

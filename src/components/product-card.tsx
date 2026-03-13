@@ -1,8 +1,26 @@
 import Link from "next/link";
 
+import { addToCartAction } from "@/app/actions/cart";
 import { ProductCardCarousel } from "@/components/product-card-carousel";
+import { CartIcon } from "@/components/ui/app-icons";
 import type { ProductCardItem } from "@/lib/products";
 import { formatCurrency, isSafeImageUrl } from "@/lib/utils";
+
+function formatCategoryLabel(category: ProductCardItem["category"]) {
+  if (category === "diecast") {
+    return "Diecast";
+  }
+  if (category === "accessories") {
+    return "Accessories";
+  }
+  if (category === "diorama") {
+    return "Diorama";
+  }
+  if (category === "velg") {
+    return "Velg";
+  }
+  return String(category);
+}
 
 export function ProductCard({
   product,
@@ -59,6 +77,9 @@ export function ProductCard({
         <div className="absolute -bottom-8 -left-2 h-20 w-28 rotate-12 bg-cyan-300/18 blur-xl transition duration-500 group-hover:opacity-95" />
 
         <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
+          <span className="rounded-full border border-white/12 bg-slate-950/35 px-2 py-1 text-[10px] font-bold text-slate-100">
+            {formatCategoryLabel(product.category)}
+          </span>
           {isSoldOut ? (
             <span className="rounded-full bg-rose-500 px-2 py-1 text-[10px] font-bold text-white">
               SOLD OUT
@@ -77,11 +98,17 @@ export function ProductCard({
       </div>
 
       <div className="space-y-3 p-4">
-        <Link href={`/products/${product.id}`} className="block">
+        {isSoldOut ? (
           <h3 className="line-clamp-2 min-h-12 text-base font-semibold text-white">
             {product.name}
           </h3>
-        </Link>
+        ) : (
+          <Link href={`/products/${product.id}`} className="block">
+            <h3 className="line-clamp-2 min-h-12 text-base font-semibold text-white">
+              {product.name}
+            </h3>
+          </Link>
+        )}
         <div className="flex items-center justify-between gap-2 text-xs">
           <p className="text-slate-300">
             Stok: <span className="font-semibold text-white">{product.stock}</span>
@@ -96,12 +123,30 @@ export function ProductCard({
             {isSoldOut ? "Habis" : "Ready"}
           </span>
         </div>
-        <Link
-          href={`/products/${product.id}`}
-          className="flex w-full items-center justify-center rounded-full border border-sky-200/50 bg-sky-300/15 px-4 py-2 text-sm font-bold text-sky-100 transition hover:border-sky-200/80 hover:bg-sky-300/25"
-        >
-          Lihat Detail
-        </Link>
+        {isSoldOut ? (
+          <span className="flex w-full cursor-not-allowed items-center justify-center rounded-full border border-rose-200/20 bg-rose-500/10 px-4 py-2 text-sm font-bold text-rose-100">
+            SOLD OUT
+          </span>
+        ) : (
+          <div className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2">
+            <form action={addToCartAction}>
+              <input type="hidden" name="product_id" value={product.id} />
+              <button
+                type="submit"
+                className="flex w-full items-center justify-center gap-2 rounded-full border border-emerald-300/45 bg-emerald-400/12 px-4 py-2 text-sm font-bold text-emerald-100 transition hover:border-emerald-300/80 hover:bg-emerald-400/20"
+              >
+                <CartIcon className="h-4 w-4" aria-hidden="true" />
+                Cart
+              </button>
+            </form>
+            <Link
+              href={`/products/${product.id}`}
+              className="flex w-full items-center justify-center rounded-full border border-sky-200/50 bg-sky-300/15 px-4 py-2 text-sm font-bold text-sky-100 transition hover:border-sky-200/80 hover:bg-sky-300/25"
+            >
+              Lihat Detail
+            </Link>
+          </div>
+        )}
       </div>
     </article>
   );

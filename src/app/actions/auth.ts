@@ -21,12 +21,26 @@ type AdminLoginConfig = {
   name: string;
 };
 
+const USER_EMAIL_DOMAIN = "user.gii-diecast.local";
+
 function normalizeEmail(value: string) {
   return value.trim().replace(/^['"]+|['"]+$/g, "").toLowerCase();
 }
 
 function isValidEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function normalizeUsername(value: string) {
+  return value.trim().replace(/^['"]+|['"]+$/g, "").toLowerCase();
+}
+
+function isValidUsername(value: string) {
+  return /^[a-z0-9][a-z0-9._-]{2,23}$/.test(value);
+}
+
+function usernameToAuthEmail(username: string) {
+  return `${username}@${USER_EMAIL_DOMAIN}`;
 }
 
 function getAdminLoginConfig(): AdminLoginConfig {
@@ -119,6 +133,7 @@ async function ensureDefaultAdminAccount() {
     {
       id: userId,
       name: config.name,
+      username: config.username,
       email: config.email,
       role: "admin",
     },
@@ -136,23 +151,45 @@ export async function registerAction(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim();
   const tiktok = String(formData.get("tiktok") ?? "").trim();
-  const email = normalizeEmail(String(formData.get("email") ?? ""));
+  const username = normalizeUsername(String(formData.get("username") ?? ""));
   const password = String(formData.get("password") ?? "");
 
-  if (!name || !phone || !email || !password) {
-    redirectWithError("/auth/register", "Nama, no telp, email, dan password wajib diisi.");
+  if (!name || !phone || !username || !password) {
+    redirectWithError("/auth/register", "Nama, no telp, username, dan password wajib diisi.");
   }
 
   if (password.length < 6) {
     redirectWithError("/auth/register", "Password minimal 6 karakter.");
   }
 
+  if (!isValidUsername(username)) {
+    redirectWithError(
+      "/auth/register",
+      "Username tidak valid. Pakai 3-24 karakter: huruf/angka + . _ -",
+    );
+  }
+
+  const email = usernameToAuthEmail(username);
   if (!isValidEmail(email)) {
-    redirectWithError("/auth/register", "Format email tidak valid. Contoh: nama@gmail.com");
+    redirectWithError("/auth/register", "Username tidak valid.");
   }
 
   const supabase = await createServerSupabaseClient();
   const admin = createAdminSupabaseClient();
+
+  const { data: existingUsername, error: usernameError } = await admin
+    .from("users")
+    .select("id")
+    .eq("username", username)
+    .maybeSingle();
+
+  if (usernameError) {
+    redirectWithError("/auth/register", usernameError.message);
+  }
+
+  if (existingUsername) {
+    redirectWithError("/auth/register", "Username sudah dipakai. Silakan pilih yang lain.");
+  }
 
   const { data: created, error: createError } = await admin.auth.admin.createUser({
     email,
@@ -160,6 +197,7 @@ export async function registerAction(formData: FormData) {
     email_confirm: true,
     user_metadata: {
       name,
+      username,
     },
   });
 
@@ -187,6 +225,7 @@ export async function registerAction(formData: FormData) {
     {
       id: userId,
       name,
+      username,
       phone: phone || null,
       tiktok: tiktok || null,
       email,
@@ -213,17 +252,18 @@ export async function registerAction(formData: FormData) {
 
 export async function loginAction(formData: FormData) {
   const intent = String(formData.get("intent") ?? "user");
-  const identifierField = intent === "admin" ? "identifier" : "email";
+  const identifierField = intent === "admin" ? "identifier" : "username";
   const identifier = normalizeIdentifier(String(formData.get(identifierField) ?? ""));
   const password = String(formData.get("password") ?? "");
 
   if (!identifier || !password) {
     const path = getLoginPath(intent);
-    const identityLabel = intent === "admin" ? "Username/email" : "Email";
+    const identityLabel = "Username";
     redirectWithError(path, `${identityLabel} dan password wajib diisi.`);
   }
 
   let email = identifier;
+  let fallbackEmail: string | null = null;
   let adminConfig: AdminLoginConfig | null = null;
 
   if (intent === "admin") {
@@ -241,11 +281,24 @@ export async function loginAction(formData: FormData) {
       );
 
       email = aliases.has(identifier) ? adminConfig.email : identifier;
+
+      // If the admin typed an email-like identifier (ex: admin@gmail.com) but it maps to the
+      // default admin email, try both so old credentials still work.
+      const typedEmail = normalizeEmail(identifier);
+      if (isValidEmail(typedEmail) && typedEmail !== email) {
+        fallbackEmail = typedEmail;
+      }
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Gagal menyiapkan akun admin.";
       redirectWithError("/admin", message);
     }
+  } else {
+    const username = normalizeUsername(identifier);
+    if (!isValidUsername(username)) {
+      redirectWithError("/auth/login", "Username tidak valid.");
+    }
+    email = usernameToAuthEmail(username);
   }
 
   const supabase = await createServerSupabaseClient();
@@ -254,10 +307,15 @@ export async function loginAction(formData: FormData) {
     await supabase.auth.signOut();
   }
 
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
+  let signInResult = await supabase.auth.signInWithPassword({ email, password });
+  if ((signInResult.error || !signInResult.data.user) && fallbackEmail) {
+    signInResult = await supabase.auth.signInWithPassword({
+      email: fallbackEmail,
+      password,
+    });
+  }
+
+  const { data, error } = signInResult;
 
   if (error || !data.user) {
     const path = getLoginPath(intent);
@@ -265,7 +323,9 @@ export async function loginAction(formData: FormData) {
       redirectWithError(path, `Login admin gagal: ${error.message}`);
     }
     const adminHint = adminConfig ? ` Username: ${adminConfig.username}` : "";
-    redirectWithError(path, `Email atau password tidak valid.${adminHint}`);
+    const baseMessage =
+      "Username atau password tidak valid.";
+    redirectWithError(path, `${baseMessage}${adminHint}`);
   }
 
   const { data: profile } = await supabase
