@@ -120,7 +120,7 @@ export function ProductCardCarousel({
             {">"}
           </button>
 
-          <div className="pointer-events-none absolute left-3 right-3 bottom-2 sm:hidden">
+          <div className="pointer-events-none absolute left-4 right-4 bottom-2 sm:hidden">
             <div className="h-1.5 rounded-full bg-white/10">
               <span
                 className="block h-full rounded-full bg-sky-200/80 transition-[transform,width] duration-200"
