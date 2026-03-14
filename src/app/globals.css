@@ -238,6 +238,11 @@ body::after {
 .product-card-carousel {
   scrollbar-width: none;
   -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.product-card-carousel > * {
+  scroll-snap-stop: always;
 }
 
 .product-card-carousel::-webkit-scrollbar {
@@ -311,5 +316,30 @@ body::after {
 @media (prefers-reduced-motion: reduce) {
   .neo-btn-whatsapp-admin {
     animation: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .panel,
+  .panel-strong {
+    backdrop-filter: none;
+  }
+
+  .product-card-carousel {
+    scrollbar-width: thin;
+  }
+
+  .product-card-carousel::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .product-card-carousel::-webkit-scrollbar-track {
+    background: rgb(148 163 184 / 18%);
+    border-radius: 999px;
+  }
+
+  .product-card-carousel::-webkit-scrollbar-thumb {
+    background: linear-gradient(90deg, rgb(125 211 252 / 85%), rgb(250 204 21 / 85%));
+    border-radius: 999px;
   }
 }

@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/app-icons";
 import { getCurrentUserWithProfile } from "@/lib/auth";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { hasCompletedAddressProfile } from "@/lib/user-profile";
 
 const homeLink = { href: "/", label: "Home", icon: HomeIcon };
 const catalogLinks = [
@@ -24,17 +23,10 @@ const catalogLinks = [
 export async function SiteHeader() {
   const { user, profile } = await getCurrentUserWithProfile();
   const isAdmin = profile?.role === "admin";
-  const addressCompleted = hasCompletedAddressProfile(profile);
-  const navLinks = isAdmin
-    ? [homeLink]
-    : profile
-      ? addressCompleted
-        ? catalogLinks
-        : [homeLink]
-      : catalogLinks;
+  const navLinks = isAdmin ? [homeLink] : catalogLinks;
 
   let cartQty = 0;
-  const showCartLink = !isAdmin && (!profile || addressCompleted);
+  const showCartLink = !isAdmin;
   if (user && showCartLink) {
     try {
       const supabase = await createServerSupabaseClient();

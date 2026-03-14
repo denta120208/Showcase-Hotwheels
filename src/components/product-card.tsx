@@ -92,9 +92,6 @@ export function ProductCard({
           ) : null}
         </div>
 
-        <span className="absolute right-3 bottom-3 rounded-full border border-cyan-200/45 bg-cyan-300/18 px-2.5 py-1 text-[11px] font-semibold text-cyan-100">
-          {formatCurrency(product.price)}
-        </span>
       </div>
 
       <div className="space-y-3 p-4">
@@ -109,6 +106,14 @@ export function ProductCard({
             </h3>
           </Link>
         )}
+        <div className="rounded-2xl border border-amber-200/25 bg-amber-300/10 px-3 py-2">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-100/80">
+            Harga
+          </p>
+          <p className="text-lg font-black text-amber-100">
+            {formatCurrency(product.price)}
+          </p>
+        </div>
         <div className="flex items-center justify-between gap-2 text-xs">
           <p className="text-slate-300">
             Stok: <span className="font-semibold text-white">{product.stock}</span>

@@ -13,6 +13,7 @@ import { CartSelectCheckbox } from "@/components/cart/cart-select-checkbox";
 import { getCurrentUserWithProfile } from "@/lib/auth";
 import { ADMIN_WHATSAPP_NUMBER } from "@/lib/constants";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { hasCompletedAddressProfile } from "@/lib/user-profile";
 import { formatCurrency, getFirstParam, isSafeImageUrl } from "@/lib/utils";
 
 type SearchParams = Record<string, string | string[] | undefined>;
@@ -84,6 +85,7 @@ export default async function CartPage({
   const error = getFirstParam(resolved.error);
 
   const { user, profile } = await getCurrentUserWithProfile();
+  const addressCompleted = hasCompletedAddressProfile(profile);
 
   if (!user) {
     return (
@@ -336,7 +338,7 @@ export default async function CartPage({
             lebih dari 1 barang.
           </p>
 
-          {checkoutItems.length > 0 ? (
+          {addressCompleted && checkoutItems.length > 0 ? (
             <a
               href={whatsappUrl}
               target="_blank"
@@ -345,10 +347,20 @@ export default async function CartPage({
             >
               Checkout via WhatsApp
             </a>
-          ) : (
+          ) : addressCompleted ? (
             <span className="mt-4 inline-flex min-h-11 w-full cursor-not-allowed items-center justify-center rounded-full bg-slate-600 px-5 py-2.5 text-sm font-bold text-slate-300">
               Pilih item dulu untuk checkout
             </span>
+          ) : (
+            <div className="mt-4 space-y-2 rounded-2xl border border-sky-200/30 bg-sky-300/10 p-3 text-sm text-sky-100">
+              <p>Lengkapi alamat dulu untuk checkout via WhatsApp.</p>
+              <Link
+                href="/user/profile"
+                className="inline-flex min-h-10 w-full items-center justify-center rounded-full border border-sky-200/50 px-4 text-xs font-semibold text-sky-100 hover:bg-sky-200/10"
+              >
+                Lengkapi Alamat
+              </Link>
+            </div>
           )}
         </div>
       </section>

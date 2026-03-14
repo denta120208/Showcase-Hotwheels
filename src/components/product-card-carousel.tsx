@@ -33,7 +33,7 @@ export function ProductCardCarousel({
     }
     const index = Math.round(track.scrollLeft / width);
     const nextIndex = Math.min(images.length - 1, Math.max(0, index));
-    setActiveIndex(nextIndex);
+    setActiveIndex((current) => (current === nextIndex ? current : nextIndex));
   }, [images.length]);
 
   const scrollByAmount = useCallback((direction: -1 | 1) => {
@@ -96,7 +96,7 @@ export function ProductCardCarousel({
     <div className="relative h-full w-full">
       <div
         ref={trackRef}
-        className="product-card-carousel flex h-full w-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden scroll-smooth touch-pan-x"
+        className="product-card-carousel flex h-full w-full snap-x snap-mandatory overscroll-x-contain overflow-x-auto overflow-y-hidden sm:scroll-smooth"
       >
         {imageNodes}
       </div>

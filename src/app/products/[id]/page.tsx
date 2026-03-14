@@ -7,6 +7,7 @@ import { CartIcon } from "@/components/ui/app-icons";
 import { getCurrentUserWithProfile } from "@/lib/auth";
 import { ADMIN_WHATSAPP_NUMBER } from "@/lib/constants";
 import { getProductById } from "@/lib/products";
+import { hasCompletedAddressProfile } from "@/lib/user-profile";
 import { formatCurrency, isSafeImageUrl } from "@/lib/utils";
 
 type Params = {
@@ -48,6 +49,7 @@ export default async function ProductDetailPage({
 
   const { product, images } = productData;
   const { user, profile } = await getCurrentUserWithProfile();
+  const addressCompleted = hasCompletedAddressProfile(profile);
 
   const gallery = [
     ...(product.image_url
@@ -104,7 +106,7 @@ export default async function ProductDetailPage({
       <section className="panel rounded-3xl border border-blue-200/20 p-3 sm:p-6">
         {gallery.length > 0 ? (
           <div className="space-y-3">
-            <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth pb-1 lg:grid lg:grid-cols-2 lg:overflow-x-visible lg:snap-none">
+            <div className="flex snap-x snap-proximity gap-3 overflow-x-auto pb-1 sm:snap-mandatory sm:scroll-smooth lg:grid lg:grid-cols-2 lg:overflow-x-visible lg:snap-none">
               {gallery.map((image, index) => (
                 <a
                   key={`${image.id}-${index}`}
@@ -216,14 +218,28 @@ export default async function ProductDetailPage({
                   Cart
                 </button>
               </form>
-              <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex w-full justify-center rounded-xl bg-emerald-500 px-4 py-2 text-sm font-bold text-emerald-950 hover:bg-emerald-400 sm:w-auto"
-              >
-                Pesan via WhatsApp
-              </a>
+              {addressCompleted ? (
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex w-full justify-center rounded-xl bg-emerald-500 px-4 py-2 text-sm font-bold text-emerald-950 hover:bg-emerald-400 sm:w-auto"
+                >
+                  Pesan via WhatsApp
+                </a>
+              ) : (
+                <div className="w-full sm:w-auto">
+                  <Link
+                    href="/user/profile"
+                    className="inline-flex w-full justify-center rounded-xl border border-sky-200/40 px-4 py-2 text-sm font-bold text-sky-100 hover:bg-sky-200/10 sm:w-auto"
+                  >
+                    Lengkapi Alamat
+                  </Link>
+                  <p className="mt-1 text-xs text-slate-200">
+                    Lengkapi alamat dulu untuk checkout via WhatsApp.
+                  </p>
+                </div>
+              )}
             </div>
           )}
         </div>
