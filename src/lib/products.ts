@@ -32,7 +32,7 @@ export type ProductDetailItem = Pick<
 >;
 export type ProductDetailImage = Pick<ProductImage, "id" | "image_url">;
 
-const PRODUCT_CARD_GALLERY_LIMIT = 6;
+const PRODUCT_CARD_GALLERY_LIMIT = 3;
 const SOLDOUT_AUTO_DELETE_AFTER_MS = 24 * 60 * 60 * 1000;
 const SOLDOUT_CLEANUP_COOLDOWN_MS = 10 * 60 * 1000;
 const SOLDOUT_CLEANUP_BATCH_SIZE = 20;
@@ -44,7 +44,7 @@ function hasSupabaseServiceRoleKey() {
   return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY);
 }
 
-async function cleanupExpiredSoldoutProducts() {
+export async function cleanupExpiredSoldoutProducts() {
   const now = Date.now();
   if (now - lastSoldoutCleanupAt < SOLDOUT_CLEANUP_COOLDOWN_MS) {
     return;
@@ -119,7 +119,6 @@ export async function getLatestProducts(limit = 6) {
   }
 
   try {
-    await cleanupExpiredSoldoutProducts();
     const supabase = await createServerSupabaseClient();
 
     const { data } = await supabase
@@ -166,7 +165,6 @@ export async function getPaginatedProducts({
   }
 
   try {
-    await cleanupExpiredSoldoutProducts();
     const supabase = await createServerSupabaseClient();
     const from = (safePage - 1) * safePageSize;
     const to = from + safePageSize - 1;
@@ -175,7 +173,7 @@ export async function getPaginatedProducts({
       .from("products")
       .select(
         "id,name,category,price,image_url,stock,is_limited,is_soldout,product_images(id,image_url,sort_order)",
-        { count: "exact" },
+        { count: "estimated" },
       )
       .order("created_at", { ascending: false })
       .order("sort_order", { referencedTable: "product_images", ascending: true })
@@ -220,7 +218,6 @@ export async function getProductById(productId: number) {
   }
 
   try {
-    await cleanupExpiredSoldoutProducts();
     const supabase = await createServerSupabaseClient();
 
     const { data: product } = await supabase

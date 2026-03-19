@@ -17,6 +17,14 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
+  const hasAuthCookie = request.cookies
+    .getAll()
+    .some(({ name }) => name.startsWith("sb-") && name.includes("auth-token"));
+
+  if (!hasAuthCookie) {
+    return response;
+  }
+
   const supabase = createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
     cookies: {
       getAll() {
